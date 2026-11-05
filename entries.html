@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Entries Management - TalentHunt</title>
+    <meta name="description" content="Submit entries, evaluate participant work, and monitor submissions." />
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <!-- Custom CSS -->
+    <link href="/css/style.css" rel="stylesheet" />
+  </head>
+  <body class="bg-body-tertiary">
+    <!-- Navbar Container -->
+    <div id="main-navbar"></div>
+
+    <main class="py-4 py-lg-5">
+      <div class="container-xl">
+        <!-- Title & Subtitle -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+          <div>
+            <h1 class="h2 fw-bold mb-1" id="entries-page-title">Entries & Submissions</h1>
+            <p class="text-secondary mb-0 small" id="entries-page-subtitle">Manage project files, performances, or evaluate student entries.</p>
+          </div>
+          <div id="entries-top-actions"></div>
+        </div>
+
+        <!-- Role Container -->
+        <div id="entries-content">
+          <!-- Loading skeleton -->
+          <div class="card card-th p-4">
+            <div class="skeleton-line mb-3" style="width: 30%"></div>
+            <div class="skeleton-line mb-2" style="width: 100%"></div>
+            <div class="skeleton-line mb-2" style="width: 90%"></div>
+            <div class="skeleton-line" style="width: 70%"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Participant Submit / Edit Entry Modal -->
+    <div class="modal fade" id="entry-modal" tabindex="-1" aria-labelledby="entryModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content card-th-static">
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold" id="entryModalLabel">Submit Entry</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form id="entry-form" novalidate>
+            <input type="hidden" id="entry-id-input" value="" />
+            <input type="hidden" id="entry-comp-id-input" value="" />
+            <div class="modal-body">
+              <div class="alert alert-info py-2 px-3 small mb-3">
+                <i class="bi bi-info-circle me-1"></i>
+                <span id="entry-comp-name" class="fw-semibold">Event Name</span>
+              </div>
+
+              <div class="mb-3">
+                <label for="entry-title-input" class="form-label small fw-semibold">Entry / Project Title</label>
+                <input type="text" class="form-control" id="entry-title-input" placeholder="e.g. Classical Fusion Routine or AlgoVis React" required />
+                <div class="invalid-feedback">Title is required.</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="entry-link-input" class="form-label small fw-semibold">Submission URL (Video, GitHub, Portfolio)</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                  <input type="url" class="form-control" id="entry-link-input" placeholder="https://youtube.com/watch?v=... or https://github.com/..." required />
+                </div>
+                <div class="form-text text-muted" style="font-size: 0.78rem;">Must start with http:// or https://</div>
+                <div class="invalid-feedback">A valid URL starting with http:// or https:// is required.</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="entry-desc-input" class="form-label small fw-semibold">Brief Concept Note / Description</label>
+                <textarea class="form-control" id="entry-desc-input" rows="3" placeholder="Explain your concept, performance notes, or design choices..."></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-th-primary" id="entry-submit-btn">Save Entry</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Judge Scoring Modal -->
+    <div class="modal fade" id="score-modal" tabindex="-1" aria-labelledby="scoreModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content card-th-static">
+          <div class="modal-header">
+            <div>
+              <h5 class="modal-title fw-bold" id="scoreModalLabel">Evaluate Entry</h5>
+              <div class="small text-secondary" id="score-entry-title">Entry Title</div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form id="score-form" novalidate>
+            <input type="hidden" id="score-entry-id" value="" />
+            <div class="modal-body">
+              <div class="p-3 bg-body-secondary rounded-3 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="text-secondary small">Participant:</span>
+                  <span class="fw-bold" id="score-participant-name">Student</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="text-secondary small">Submission:</span>
+                  <a href="#" target="_blank" rel="noopener noreferrer" id="score-entry-link" class="small fw-semibold text-primary">
+                    Open Link <i class="bi bi-box-arrow-up-right ms-1"></i>
+                  </a>
+                </div>
+                <p class="small text-secondary mb-0 border-top pt-2" id="score-entry-desc"></p>
+              </div>
+
+              <!-- Scoring Sliders -->
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <label for="score-creativity" class="form-label small fw-bold mb-0">1. Creativity & Originality (0 - 10)</label>
+                  <span class="badge bg-primary fs-6" id="val-creativity">8.0</span>
+                </div>
+                <input type="range" class="form-range" min="0" max="10" step="0.5" id="score-creativity" value="8" />
+              </div>
+
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <label for="score-skill" class="form-label small fw-bold mb-0">2. Technical Skill & Execution (0 - 10)</label>
+                  <span class="badge bg-primary fs-6" id="val-skill">8.0</span>
+                </div>
+                <input type="range" class="form-range" min="0" max="10" step="0.5" id="score-skill" value="8" />
+              </div>
+
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <label for="score-presentation" class="form-label small fw-bold mb-0">3. Presentation & Polish (0 - 10)</label>
+                  <span class="badge bg-primary fs-6" id="val-presentation">8.0</span>
+                </div>
+                <input type="range" class="form-range" min="0" max="10" step="0.5" id="score-presentation" value="8" />
+              </div>
+
+              <!-- Total Score Display -->
+              <div class="p-3 rounded-3 text-center mb-3 text-white" style="background: linear-gradient(135deg, #4f46e5, #312e81);">
+                <div class="small text-white-50 text-uppercase fw-semibold">Aggregate Score</div>
+                <div class="display-6 fw-bold" id="val-total">24.0 / 30</div>
+              </div>
+
+              <!-- Comments -->
+              <div class="mb-3">
+                <label for="score-comments" class="form-label small fw-semibold">Constructive Feedback / Comments</label>
+                <textarea class="form-control" id="score-comments" rows="3" placeholder="Provide actionable constructive critique..."></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-th-primary" id="score-submit-btn">Submit Official Score</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="th-footer mt-auto">
+      <div class="container-xl text-center">
+        <p class="mb-0 small text-secondary">TalentHunt &copy; 2026. Online Talent Hunt and Competition Management Platform.</p>
+      </div>
+    </footer>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core App JS -->
+    <script src="/js/app.js"></script>
+    <script>
+      let currentUser = null;
+      let participantEntries = [];
+      let judgeCompetitions = [];
+      let activeJudgeCompId = null;
+
+      onReady(async () => {
+        if (!requireLogin()) return;
+        renderNav('entries');
+        currentUser = getCurrentUser();
+
+        if (currentUser.role === 'participant') {
+          document.getElementById('entries-page-title').textContent = 'My Registrations & Entries';
+          document.getElementById('entries-page-subtitle').textContent = 'Submit your project URLs, manage draft updates, and monitor judge evaluations.';
+          await loadParticipantEntries();
+          setupParticipantForm();
+        } else if (currentUser.role === 'judge') {
+          document.getElementById('entries-page-title').textContent = 'Jury Evaluation Panel';
+          document.getElementById('entries-page-subtitle').textContent = 'Review candidate submissions, assess against rubrics, and record official marks.';
+          await loadJudgePanel();
+          setupJudgeScoring();
+        } else if (currentUser.role === 'admin') {
+          document.getElementById('entries-page-title').textContent = 'All Submissions Overview';
+          document.getElementById('entries-page-subtitle').textContent = 'Read-only administrative view of all participant submissions and evaluation tallies.';
+          await loadAdminEntriesView();
+        }
+      });
+
+      // ==========================================
+      // PARTICIPANT VIEW
+      // ==========================================
+      async function loadParticipantEntries() {
+        try {
+          participantEntries = await api('/entries/mine');
+          renderParticipantTable(participantEntries);
+        } catch (err) {
+          showToast((err && err.message) || 'Error loading entries', 'danger');
+        }
+      }
+
+      function renderParticipantTable(items) {
+        const container = document.getElementById('entries-content');
+        if (items.length === 0) {
+          container.innerHTML = `
+            <div class="card card-th-static empty-state">
+              <i class="bi bi-folder-x empty-state-icon"></i>
+              <h4 class="fw-bold">No Event Registrations Yet</h4>
+              <p class="text-secondary max-w-md mx-auto mb-4">You have not registered for any active competitions yet. Browse our catalog and claim your stage.</p>
+              <div>
+                <a href="competitions.html" class="btn btn-th-primary fw-semibold px-4">
+                  <i class="bi bi-trophy me-2"></i>Explore Competitions
+                </a>
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+
+        const rows = items.map(item => {
+          const comp = item.competition;
+          const entry = item.entry;
+          const scoreInfo = item.scoreInfo;
+          const isPassedSubDeadline = today > comp.subDeadline;
+          const isScored = scoreInfo && scoreInfo.count > 0;
+
+          let statusBadge = '';
+          if (!entry) {
+            statusBadge = '<span class="badge bg-warning-subtle text-warning-emphasis">Pending Submission</span>';
+          } else if (comp.status === 'Published') {
+            statusBadge = `<span class="badge badge-status-published">Results Out (${item.rank ? '#' + item.rank : 'Unranked'})</span>`;
+          } else if (isScored) {
+            statusBadge = '<span class="badge bg-info-subtle text-info-emphasis">Evaluated by Jury</span>';
+          } else {
+            statusBadge = '<span class="badge bg-success-subtle text-success">Submitted</span>';
+          }
+
+          let scoreDisplay = '-';
+          if (comp.status === 'Published' && scoreInfo) {
+            scoreDisplay = `<span class="fw-bold text-success">${scoreInfo.average} / 30</span>`;
+          } else if (isScored) {
+            scoreDisplay = `<span class="text-muted small">Scored (Provisional)</span>`;
+          }
+
+          let actionBtn = '';
+          if (!entry) {
+            if (isPassedSubDeadline) {
+              actionBtn = '<span class="text-danger small fw-semibold">Deadline Passed</span>';
+            } else {
+              actionBtn = `
+                <button class="btn btn-sm btn-th-primary fw-semibold" onclick="openParticipantEntryModal('${comp.id}', null)">
+                  <i class="bi bi-cloud-arrow-up me-1"></i> Submit Entry
+                </button>
+              `;
+            }
+          } else {
+            if (isScored) {
+              actionBtn = '<span class="badge bg-secondary-subtle text-secondary">Locked (Evaluated)</span>';
+            } else if (isPassedSubDeadline) {
+              actionBtn = '<span class="badge bg-secondary-subtle text-secondary">Locked (Deadline)</span>';
+            } else {
+              actionBtn = `
+                <button class="btn btn-sm btn-outline-primary fw-semibold" onclick="openParticipantEntryModal('${comp.id}', '${entry.id}')">
+                  <i class="bi bi-pencil me-1"></i> Edit Entry
+                </button>
+              `;
+            }
+          }
+
+          return `
+            <tr>
+              <td>
+                <div class="fw-bold">${esc(comp.title)}</div>
+                <span class="badge bg-light text-dark border small">${esc(comp.category)}</span>
+              </td>
+              <td>
+                ${entry ? `
+                  <div class="fw-semibold text-body-emphasis">${esc(entry.title)}</div>
+                  <a href="${esc(entry.link)}" target="_blank" rel="noopener noreferrer" class="small text-primary text-decoration-none d-inline-flex align-items-center gap-1">
+                    <span>${esc(entry.link)}</span> <i class="bi bi-box-arrow-up-right" style="font-size: 0.75rem;"></i>
+                  </a>
+                ` : '<span class="text-secondary small fst-italic">No submission recorded</span>'}
+              </td>
+              <td>
+                <div>${formatDate(comp.subDeadline)}</div>
+                <div class="text-muted small" style="font-size: 0.75rem;">Registered ${formatDate(item.registeredAt)}</div>
+              </td>
+              <td>${statusBadge}</td>
+              <td>${scoreDisplay}</td>
+              <td class="text-end">${actionBtn}</td>
+            </tr>
+          `;
+        }).join('');
+
+        container.innerHTML = `
+          <div class="card card-th-static p-0 overflow-hidden shadow-sm">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr class="small text-secondary">
+                    <th>Competition</th>
+                    <th>My Submission</th>
+                    <th>Submission Deadline</th>
+                    <th>Status</th>
+                    <th>Score / Rank</th>
+                    <th class="text-end">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rows}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+
+      function openParticipantEntryModal(compId, entryId) {
+        const item = participantEntries.find(i => i.competition.id === compId);
+        if (!item) return;
+
+        const form = document.getElementById('entry-form');
+        clearInvalid(form);
+        form.reset();
+
+        document.getElementById('entry-comp-id-input').value = compId;
+        document.getElementById('entry-id-input').value = entryId || '';
+        document.getElementById('entry-comp-name').textContent = `${item.competition.title} (Deadline: ${formatDate(item.competition.subDeadline)})`;
+
+        if (entryId && item.entry) {
+          document.getElementById('entryModalLabel').textContent = 'Edit Your Entry';
+          document.getElementById('entry-title-input').value = item.entry.title;
+          document.getElementById('entry-link-input').value = item.entry.link;
+          document.getElementById('entry-desc-input').value = item.entry.description || '';
+        } else {
+          document.getElementById('entryModalLabel').textContent = 'Submit New Entry';
+        }
+
+        new bootstrap.Modal(document.getElementById('entry-modal')).show();
+      }
+
+      function setupParticipantForm() {
+        const form = document.getElementById('entry-form');
+        const submitBtn = document.getElementById('entry-submit-btn');
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          clearInvalid(form);
+
+          const compId = document.getElementById('entry-comp-id-input').value;
+          const entryId = document.getElementById('entry-id-input').value || ('temp_' + Date.now());
+          const title = document.getElementById('entry-title-input').value.trim();
+          const link = document.getElementById('entry-link-input').value.trim();
+          const desc = document.getElementById('entry-desc-input').value.trim();
+
+          let hasErr = false;
+          if (!title) {
+            markInvalid(document.getElementById('entry-title-input'), 'Entry title is required');
+            hasErr = true;
+          }
+          if (!link || !/^https?:\/\//i.test(link)) {
+            markInvalid(document.getElementById('entry-link-input'), 'Valid link starting with http:// or https:// is required');
+            hasErr = true;
+          }
+          if (hasErr) return;
+
+          setBtnLoading(submitBtn, true);
+
+          try {
+            await api(`/entries/${entryId}`, 'PUT', {
+              competitionId: compId,
+              title,
+              link,
+              description: desc
+            });
+
+            setBtnLoading(submitBtn, false);
+            bootstrap.Modal.getInstance(document.getElementById('entry-modal')).hide();
+            showToast('Entry saved successfully!', 'success');
+            await loadParticipantEntries();
+          } catch (err) {
+            setBtnLoading(submitBtn, false);
+            showToast((err && err.message) || 'Error saving entry', 'danger');
+          }
+        });
+      }
+
+      // ==========================================
+      // JUDGE PANEL VIEW
+      // ==========================================
+      async function loadJudgePanel() {
+        try {
+          judgeCompetitions = await api('/judge/competitions');
+          const container = document.getElementById('entries-content');
+
+          if (judgeCompetitions.length === 0) {
+            container.innerHTML = `
+              <div class="card card-th-static empty-state">
+                <i class="bi bi-shield-slash empty-state-icon"></i>
+                <h4 class="fw-bold">No Competitions Assigned</h4>
+                <p class="text-secondary max-w-md mx-auto mb-0">You have not been assigned to judge any active competitions by the faculty administrator yet.</p>
+              </div>
+            `;
+            return;
+          }
+
+          // Injected Competition Dropdown Selector
+          document.getElementById('entries-top-actions').innerHTML = `
+            <div class="d-flex align-items-center gap-2">
+              <label for="judge-comp-select" class="small fw-semibold text-secondary text-nowrap mb-0">Select Event:</label>
+              <select id="judge-comp-select" class="form-select form-select-sm" style="min-width: 220px;">
+                ${judgeCompetitions.map(c => `<option value="${c.id}">${esc(c.title)} (${c.status})</option>`).join('')}
+              </select>
+            </div>
+          `;
+
+          activeJudgeCompId = judgeCompetitions[0].id;
+          document.getElementById('judge-comp-select').addEventListener('change', (e) => {
+            activeJudgeCompId = e.target.value;
+            loadJudgeEntriesForComp(activeJudgeCompId);
+          });
+
+          await loadJudgeEntriesForComp(activeJudgeCompId);
+        } catch (err) {
+          showToast((err && err.message) || 'Error loading judge panel', 'danger');
+        }
+      }
+
+      async function loadJudgeEntriesForComp(compId) {
+        const container = document.getElementById('entries-content');
+        container.innerHTML = '<div class="card card-th p-4 text-center text-secondary">Loading submissions...</div>';
+
+        try {
+          const comp = judgeCompetitions.find(c => c.id === compId);
+          const entries = await api(`/competitions/${compId}/entries`);
+
+          if (entries.length === 0) {
+            container.innerHTML = `
+              <div class="card card-th-static empty-state">
+                <i class="bi bi-inbox empty-state-icon"></i>
+                <h4 class="fw-bold">No Submissions Yet</h4>
+                <p class="text-secondary max-w-md mx-auto mb-0">Participants have not uploaded their entry links for this competition yet.</p>
+              </div>
+            `;
+            return;
+          }
+
+          const isPublished = comp && comp.status === 'Published';
+
+          const rows = entries.map(e => {
+            const hasScored = !!e.myScore;
+            let scoreCell = '';
+            let actionBtn = '';
+
+            if (hasScored) {
+              scoreCell = `
+                <div>
+                  <span class="badge bg-success-subtle text-success fw-bold fs-6">${e.myScore.total} / 30</span>
+                  <div class="small text-muted" style="font-size: 0.72rem;">C: ${e.myScore.creativity} · S: ${e.myScore.skill} · P: ${e.myScore.presentation}</div>
+                </div>
+              `;
+              actionBtn = '<span class="badge bg-secondary-subtle text-secondary"><i class="bi bi-check2-all me-1"></i>Score Submitted</span>';
+            } else if (isPublished) {
+              scoreCell = '<span class="text-muted small">Not Scored</span>';
+              actionBtn = '<span class="badge bg-secondary-subtle text-secondary">Event Published</span>';
+            } else {
+              scoreCell = '<span class="badge bg-warning-subtle text-warning-emphasis">Awaiting Review</span>';
+              actionBtn = `
+                <button class="btn btn-sm btn-th-primary fw-semibold" onclick="openScoringModal('${e.id}')">
+                  <i class="bi bi-pencil-square me-1"></i> Grade & Score
+                </button>
+              `;
+            }
+
+            return `
+              <tr>
+                <td>
+                  <div class="fw-bold">${esc(e.participantName)}</div>
+                  <div class="text-muted small">${esc(e.participantEmail)}</div>
+                </td>
+                <td>
+                  <div class="fw-semibold text-body-emphasis">${esc(e.title)}</div>
+                  <div class="small text-secondary mb-1" style="max-width: 380px;">${esc(e.description || 'No description provided')}</div>
+                  <a href="${esc(e.link)}" target="_blank" rel="noopener noreferrer" class="btn btn-xs btn-outline-secondary py-0 px-2 small text-primary" style="font-size: 0.75rem;">
+                    <i class="bi bi-link-45deg"></i> Open Submission Link
+                  </a>
+                </td>
+                <td>${formatDate(e.submittedAt)}</td>
+                <td>${scoreCell}</td>
+                <td class="text-end">${actionBtn}</td>
+              </tr>
+            `;
+          }).join('');
+
+          container.innerHTML = `
+            <div class="card card-th-static p-0 overflow-hidden shadow-sm">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr class="small text-secondary">
+                      <th>Participant</th>
+                      <th>Entry Details & Link</th>
+                      <th>Submitted Date</th>
+                      <th>My Evaluation</th>
+                      <th class="text-end">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${rows}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+        } catch (err) {
+          showToast((err && err.message) || 'Error loading entries', 'danger');
+        }
+      }
+
+      function setupJudgeScoring() {
+        const cSlider = document.getElementById('score-creativity');
+        const sSlider = document.getElementById('score-skill');
+        const pSlider = document.getElementById('score-presentation');
+
+        const cVal = document.getElementById('val-creativity');
+        const sVal = document.getElementById('val-skill');
+        const pVal = document.getElementById('val-presentation');
+        const totalVal = document.getElementById('val-total');
+
+        function updateTotals() {
+          const c = parseFloat(cSlider.value) || 0;
+          const s = parseFloat(sSlider.value) || 0;
+          const p = parseFloat(pSlider.value) || 0;
+          cVal.textContent = c.toFixed(1);
+          sVal.textContent = s.toFixed(1);
+          pVal.textContent = p.toFixed(1);
+          totalVal.textContent = `${(c + s + p).toFixed(1)} / 30`;
+        }
+
+        cSlider.addEventListener('input', updateTotals);
+        sSlider.addEventListener('input', updateTotals);
+        pSlider.addEventListener('input', updateTotals);
+
+        const form = document.getElementById('score-form');
+        const submitBtn = document.getElementById('score-submit-btn');
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const entryId = document.getElementById('score-entry-id').value;
+          const c = parseFloat(cSlider.value);
+          const s = parseFloat(sSlider.value);
+          const p = parseFloat(pSlider.value);
+          const comments = document.getElementById('score-comments').value.trim();
+
+          setBtnLoading(submitBtn, true);
+
+          try {
+            await api(`/entries/${entryId}/score`, 'POST', {
+              creativity: c,
+              skill: s,
+              presentation: p,
+              comments
+            });
+
+            setBtnLoading(submitBtn, false);
+            bootstrap.Modal.getInstance(document.getElementById('score-modal')).hide();
+            showToast('Score saved successfully!', 'success');
+            await loadJudgeEntriesForComp(activeJudgeCompId);
+          } catch (err) {
+            setBtnLoading(submitBtn, false);
+            showToast((err && err.message) || 'Error saving score', 'danger');
+          }
+        });
+      }
+
+      async function openScoringModal(entryId) {
+        try {
+          const entries = await api(`/competitions/${activeJudgeCompId}/entries`);
+          const entry = entries.find(e => e.id === entryId);
+          if (!entry) return;
+
+          document.getElementById('score-entry-id').value = entry.id;
+          document.getElementById('score-entry-title').textContent = entry.title;
+          document.getElementById('score-participant-name').textContent = entry.participantName;
+          document.getElementById('score-entry-link').href = entry.link;
+          document.getElementById('score-entry-desc').textContent = entry.description || 'No description provided';
+
+          // Reset Sliders
+          document.getElementById('score-creativity').value = 8;
+          document.getElementById('score-skill').value = 8;
+          document.getElementById('score-presentation').value = 8;
+          document.getElementById('val-creativity').textContent = '8.0';
+          document.getElementById('val-skill').textContent = '8.0';
+          document.getElementById('val-presentation').textContent = '8.0';
+          document.getElementById('val-total').textContent = '24.0 / 30';
+          document.getElementById('score-comments').value = '';
+
+          new bootstrap.Modal(document.getElementById('score-modal')).show();
+        } catch (err) {
+          showToast('Failed to load entry details', 'danger');
+        }
+      }
+
+      // ==========================================
+      // ADMIN READ-ONLY VIEW
+      // ==========================================
+      async function loadAdminEntriesView() {
+        try {
+          const comps = await api('/competitions');
+          const container = document.getElementById('entries-content');
+
+          if (comps.length === 0) {
+            container.innerHTML = '<div class="card card-th p-4 text-center text-secondary">No competitions found.</div>';
+            return;
+          }
+
+          document.getElementById('entries-top-actions').innerHTML = `
+            <div class="d-flex align-items-center gap-2">
+              <label for="admin-comp-select" class="small fw-semibold text-secondary text-nowrap mb-0">Select Event:</label>
+              <select id="admin-comp-select" class="form-select form-select-sm" style="min-width: 220px;">
+                ${comps.map(c => `<option value="${c.id}">${esc(c.title)} (${c.status})</option>`).join('')}
+              </select>
+            </div>
+          `;
+
+          let currentCompId = comps[0].id;
+          document.getElementById('admin-comp-select').addEventListener('change', (e) => {
+            currentCompId = e.target.value;
+            renderAdminEntries(currentCompId);
+          });
+
+          await renderAdminEntries(currentCompId);
+        } catch (err) {
+          showToast((err && err.message) || 'Error loading submissions', 'danger');
+        }
+      }
+
+      async function renderAdminEntries(compId) {
+        const container = document.getElementById('entries-content');
+        container.innerHTML = '<div class="card card-th p-4 text-center text-secondary">Loading submissions...</div>';
+
+        try {
+          const entries = await api(`/competitions/${compId}/entries`);
+          if (entries.length === 0) {
+            container.innerHTML = `
+              <div class="card card-th-static empty-state">
+                <i class="bi bi-inbox empty-state-icon"></i>
+                <h4 class="fw-bold">No Submissions Yet</h4>
+                <p class="text-secondary max-w-md mx-auto mb-0">No participant entries have been submitted for this competition.</p>
+              </div>
+            `;
+            return;
+          }
+
+          const rows = entries.map(e => `
+            <tr>
+              <td>
+                <div class="fw-bold">${esc(e.participantName)}</div>
+                <div class="text-muted small">${esc(e.participantEmail)}</div>
+              </td>
+              <td>
+                <div class="fw-semibold text-body-emphasis">${esc(e.title)}</div>
+                <div class="small text-secondary mb-1">${esc(e.description || 'No description')}</div>
+                <a href="${esc(e.link)}" target="_blank" rel="noopener noreferrer" class="small text-primary">
+                  ${esc(e.link)} <i class="bi bi-box-arrow-up-right ms-1"></i>
+                </a>
+              </td>
+              <td>${formatDate(e.submittedAt)}</td>
+              <td>
+                <span class="badge bg-primary-subtle text-primary fw-bold">${e.scoresCount} judge(s)</span>
+              </td>
+              <td>
+                <span class="fw-bold fs-6">${e.scoresCount > 0 ? e.averageScore + ' / 30' : 'Unrated'}</span>
+              </td>
+            </tr>
+          `).join('');
+
+          container.innerHTML = `
+            <div class="card card-th-static p-0 overflow-hidden shadow-sm">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr class="small text-secondary">
+                      <th>Participant</th>
+                      <th>Entry Details & URL</th>
+                      <th>Submission Date</th>
+                      <th>Jury Evaluations</th>
+                      <th>Average Score</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${rows}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+        } catch (err) {
+          showToast((err && err.message) || 'Error fetching submissions', 'danger');
+        }
+      }
+    </script>
+  </body>
+</html>

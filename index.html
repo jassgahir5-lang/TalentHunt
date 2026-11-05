@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TalentHunt - Online Talent Hunt & Competition Management Platform</title>
+    <meta name="description" content="Discover, compete, and shine on stage. A modern competition management platform for students, judges, and administrators." />
+    <meta property="og:title" content="TalentHunt - Online Talent Hunt & Competition Management Platform" />
+    <meta property="og:description" content="Discover, compete, and shine on stage. College talent hunt and competition platform." />
+    <meta property="og:type" content="website" />
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <!-- Custom CSS -->
+    <link href="/css/style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- Navbar Container -->
+    <div id="main-navbar"></div>
+
+    <main>
+      <!-- Hero Section -->
+      <section class="hero-section py-5 py-lg-6 border-bottom">
+        <div class="container-xl py-4">
+          <div class="row align-items-center g-5">
+            <div class="col-lg-7 text-center text-lg-start">
+              <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold mb-3">
+                <i class="bi bi-mortarboard-fill me-1"></i> College Talent & Technical Showcase 2026
+              </span>
+              <h1 class="display-4 fw-bold lh-tight mb-3">
+                Discover. Compete.<br />
+                <span class="hero-title-gradient">Shine on stage.</span>
+              </h1>
+              <p class="lead text-secondary mb-4 col-lg-11">
+                Welcome to TalentHunt — the unified platform for student competitions. Showcase your skills in singing, dancing, coding, design, and literature with real-time judging and live leaderboards.
+              </p>
+              <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-3" id="hero-actions">
+                <a href="register.html" class="btn btn-th-gradient btn-lg px-4 py-2">
+                  <i class="bi bi-sparkles me-2"></i>Get Started Free
+                </a>
+                <a href="competitions.html" class="btn btn-outline-secondary btn-lg px-4 py-2">
+                  <i class="bi bi-compass me-2"></i>Explore Competitions
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-5">
+              <div class="card card-th-static p-4 border-0 shadow-lg text-white" style="background: var(--th-bg-gradient);">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-award-fill text-warning fs-3"></i>
+                    <h5 class="mb-0 fw-bold">Live Platform Pulse</h5>
+                  </div>
+                  <span class="badge bg-white text-dark fw-bold px-2 py-1">Online</span>
+                </div>
+                <div class="row g-3" id="hero-stats">
+                  <div class="col-6">
+                    <div class="p-3 rounded-3 bg-white bg-opacity-10 backdrop-blur">
+                      <div class="text-white-50 small mb-1">Competitions</div>
+                      <div class="fs-3 fw-bold" id="stat-comps">4</div>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="p-3 rounded-3 bg-white bg-opacity-10 backdrop-blur">
+                      <div class="text-white-50 small mb-1">Participants</div>
+                      <div class="fs-3 fw-bold" id="stat-participants">4</div>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="p-3 rounded-3 bg-white bg-opacity-10 backdrop-blur">
+                      <div class="text-white-50 small mb-1">Judges Panel</div>
+                      <div class="fs-3 fw-bold" id="stat-judges">2</div>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="p-3 rounded-3 bg-white bg-opacity-10 backdrop-blur">
+                      <div class="text-white-50 small mb-1">Total Entries</div>
+                      <div class="fs-3 fw-bold" id="stat-entries">5</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Active Competitions Preview -->
+      <section class="py-5">
+        <div class="container-xl">
+          <div class="d-flex flex-wrap justify-content-between align-items-end mb-4">
+            <div>
+              <h2 class="h3 fw-bold mb-1">Open Competitions</h2>
+              <p class="text-secondary mb-0">Browse actively running events open for registrations and submissions.</p>
+            </div>
+            <a href="competitions.html" class="btn btn-outline-primary fw-semibold mt-2 mt-sm-0">
+              View All Events <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+          </div>
+
+          <div class="row g-4" id="home-competitions-list">
+            <!-- Singing Star 2026 -->
+            <div class="col-md-4">
+              <div class="card card-th h-100 d-flex flex-column">
+                <div class="category-strip cat-strip-singing"></div>
+                <div class="card-body p-4 d-flex flex-column">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-light text-dark border px-2 py-1 small fw-semibold">
+                      <i class="bi bi-mic me-1 text-primary"></i>Singing
+                    </span>
+                    <span class="badge badge-status-open px-2 py-1 small">Open</span>
+                  </div>
+                  <h4 class="h5 fw-bold mb-2">Singing Star 2026</h4>
+                  <p class="text-secondary small flex-grow-1 mb-3">Showcase your vocal range, pitch perfection, and stage charisma in this solo singing extravaganza.</p>
+                  <div class="border-top pt-3 mt-auto">
+                    <div class="d-flex justify-content-between text-secondary small mb-3">
+                      <span><i class="bi bi-clock me-1"></i>Status:</span>
+                      <span class="fw-semibold text-body-emphasis">Registration Open</span>
+                    </div>
+                    <a href="competitions.html" class="btn btn-outline-primary w-100 fw-semibold">
+                      Details & Register
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Code Sprint Hackathon -->
+            <div class="col-md-4">
+              <div class="card card-th h-100 d-flex flex-column">
+                <div class="category-strip cat-strip-coding"></div>
+                <div class="card-body p-4 d-flex flex-column">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-light text-dark border px-2 py-1 small fw-semibold">
+                      <i class="bi bi-code-slash me-1 text-primary"></i>Coding
+                    </span>
+                    <span class="badge badge-status-open px-2 py-1 small">Open</span>
+                  </div>
+                  <h4 class="h5 fw-bold mb-2">Code Sprint Hackathon</h4>
+                  <p class="text-secondary small flex-grow-1 mb-3">Solve real-world challenges through creative programming, algorithms, and clean full-stack architectural design.</p>
+                  <div class="border-top pt-3 mt-auto">
+                    <div class="d-flex justify-content-between text-secondary small mb-3">
+                      <span><i class="bi bi-clock me-1"></i>Status:</span>
+                      <span class="fw-semibold text-body-emphasis">Registration Open</span>
+                    </div>
+                    <a href="competitions.html" class="btn btn-outline-primary w-100 fw-semibold">
+                      Details & Register
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Canvas Colours Exhibition -->
+            <div class="col-md-4">
+              <div class="card card-th h-100 d-flex flex-column">
+                <div class="category-strip cat-strip-art"></div>
+                <div class="card-body p-4 d-flex flex-column">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-light text-dark border px-2 py-1 small fw-semibold">
+                      <i class="bi bi-palette me-1 text-primary"></i>Art & Design
+                    </span>
+                    <span class="badge badge-status-open px-2 py-1 small">Open</span>
+                  </div>
+                  <h4 class="h5 fw-bold mb-2">Canvas Colours Exhibition</h4>
+                  <p class="text-secondary small flex-grow-1 mb-3">Digital art, traditional sketches, and UI/UX design showcase celebrating visual storytelling.</p>
+                  <div class="border-top pt-3 mt-auto">
+                    <div class="d-flex justify-content-between text-secondary small mb-3">
+                      <span><i class="bi bi-clock me-1"></i>Status:</span>
+                      <span class="fw-semibold text-body-emphasis">Registration Open</span>
+                    </div>
+                    <a href="competitions.html" class="btn btn-outline-primary w-100 fw-semibold">
+                      Details & Register
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6 Feature Cards -->
+      <section class="py-5 bg-body-tertiary border-top border-bottom">
+        <div class="container-xl">
+          <div class="text-center max-w-2xl mx-auto mb-5">
+            <h2 class="h3 fw-bold mb-2">Designed for Fair, Inspiring Competitions</h2>
+            <p class="text-secondary">Everything students, jury panels, and faculty organizers need in one integrated platform.</p>
+          </div>
+
+          <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+              <div class="card card-th h-100 p-4">
+                <div class="stat-icon-wrapper bg-primary-subtle text-primary mb-3">
+                  <i class="bi bi-grid-3x3-gap-fill"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Multi-Category Events</h5>
+                <p class="text-secondary small mb-0">From cultural arts like singing and dance to technical hackathons and literary debate, all domains are supported seamlessly.</p>
+              </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+              <div class="card card-th h-100 p-4">
+                <div class="stat-icon-wrapper bg-info-subtle text-info mb-3">
+                  <i class="bi bi-sliders"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Transparent Multi-Jury Scoring</h5>
+                <p class="text-secondary small mb-0">Judges grade anonymously using standardized rubrics: Creativity, Technical Skill, and Presentation (0-10 each) with detailed feedback.</p>
+              </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+              <div class="card card-th h-100 p-4">
+                <div class="stat-icon-wrapper bg-warning-subtle text-warning mb-3">
+                  <i class="bi bi-trophy-fill"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Live Dynamic Leaderboards</h5>
+                <p class="text-secondary small mb-0">Gold, silver, and bronze visual podiums alongside exact scoring averages once faculty admins publish verified results.</p>
+              </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+              <div class="card card-th h-100 p-4">
+                <div class="stat-icon-wrapper bg-success-subtle text-success mb-3">
+                  <i class="bi bi-cloud-arrow-up-fill"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Streamlined Submissions</h5>
+                <p class="text-secondary small mb-0">Submit YouTube performances, GitHub repositories, or cloud portfolios. Edit freely until the submission deadline or judging begins.</p>
+              </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+              <div class="card card-th h-100 p-4">
+                <div class="stat-icon-wrapper bg-danger-subtle text-danger mb-3">
+                  <i class="bi bi-person-badge-fill"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Role-Tailored Dashboards</h5>
+                <p class="text-secondary small mb-0">Dedicated portals for Participants to track submissions, Judges to review assigned entries, and Admins to govern competitions.</p>
+              </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+              <div class="card card-th h-100 p-4">
+                <div class="stat-icon-wrapper bg-purple-subtle text-purple mb-3" style="background-color: #ede9fe; color: #7c3aed;">
+                  <i class="bi bi-shield-check"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Verified Admin Oversight</h5>
+                <p class="text-secondary small mb-0">Judge account vetting, tamper-proof SHA-256 security, automatic deadline enforcement, and cascading cleanup.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Announcements Section -->
+      <section class="py-5">
+        <div class="container-xl">
+          <div class="row g-4 align-items-start">
+            <div class="col-lg-4">
+              <div class="sticky-top" style="top: 2rem;">
+                <span class="badge bg-warning-subtle text-warning-emphasis px-3 py-2 rounded-pill fw-semibold mb-2">
+                  <i class="bi bi-megaphone-fill me-1"></i> Bulletin Board
+                </span>
+                <h3 class="fw-bold mb-2">Official Announcements</h3>
+                <p class="text-secondary">Stay informed regarding schedule changes, judging milestones, and grand championship declarations.</p>
+              </div>
+            </div>
+            <div class="col-lg-8" id="home-announcements-list">
+              <div class="card card-th p-4 mb-3 border-primary">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-danger">Urgent</span>
+                    <h5 class="fw-bold mb-0">Welcome to TalentHunt Annual Cultural &amp; Technical Extravaganza 2026!</h5>
+                  </div>
+                  <span class="text-secondary small">Active</span>
+                </div>
+                <p class="text-secondary mb-2">We are thrilled to launch the online competition management platform. Check out active competitions in Singing, Coding, and Art. Ensure you register and submit before the designated deadlines!</p>
+                <div class="text-muted small">
+                  <i class="bi bi-person-fill me-1"></i>Posted by System Admin
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="th-footer mt-auto">
+      <div class="container-xl text-center">
+        <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+          <i class="bi bi-stars text-warning fs-5"></i>
+          <span class="fw-bold text-dark-emphasis">TalentHunt</span>
+        </div>
+        <p class="mb-1">Online Talent Hunt and Competition Management Platform - Java Servlets and Apache Tomcat project</p>
+        <p class="text-body-secondary small mb-0">&copy; 2026 TalentHunt. All academic competition rights reserved.</p>
+      </div>
+    </footer>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core App JS -->
+    <script src="/js/app.js"></script>
+    <script>
+      onReady(async () => {
+        renderNav('home');
+
+        // Check if user is logged in to change Hero buttons
+        const user = getCurrentUser();
+        const heroActions = document.getElementById('hero-actions');
+        if (user && heroActions) {
+          heroActions.innerHTML = `
+            <a href="dashboard.html" class="btn btn-th-gradient btn-lg px-4 py-2">
+              <i class="bi bi-speedometer2 me-2"></i>Go to Dashboard
+            </a>
+            <a href="competitions.html" class="btn btn-outline-secondary btn-lg px-4 py-2">
+              <i class="bi bi-trophy me-2"></i>Explore Competitions
+            </a>
+          `;
+        }
+
+        // Fetch Stats
+        try {
+          const stats = await api('/public/stats');
+          document.getElementById('stat-comps').textContent = stats.competitionsCount || 4;
+          document.getElementById('stat-participants').textContent = stats.participantsCount || 4;
+          document.getElementById('stat-judges').textContent = stats.judgesCount || 2;
+          document.getElementById('stat-entries').textContent = stats.entriesCount || 5;
+        } catch (e) {
+          console.error(e);
+        }
+
+        // Refresh Announcements
+        try {
+          const announcements = await api('/announcements');
+          const annContainer = document.getElementById('home-announcements-list');
+          if (announcements && announcements.length > 0) {
+            annContainer.innerHTML = announcements.slice(0, 3).map(a => {
+              const isHigh = a.priority === 'high';
+              return `
+                <div class="card card-th p-4 mb-3 ${isHigh ? 'border-primary' : ''}">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center gap-2">
+                      ${isHigh ? '<span class="badge bg-danger">Urgent</span>' : '<span class="badge bg-secondary-subtle text-secondary">Update</span>'}
+                      <h5 class="fw-bold mb-0">${esc(a.title)}</h5>
+                    </div>
+                    <span class="text-secondary small">${formatDate(a.createdAt)}</span>
+                  </div>
+                  <p class="text-secondary mb-2">${esc(a.content)}</p>
+                  <div class="text-muted small">
+                    <i class="bi bi-person-fill me-1"></i>Posted by ${esc(a.authorName)}
+                  </div>
+                </div>
+              `;
+            }).join('');
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      });
+    </script>
+  </body>
+</html>

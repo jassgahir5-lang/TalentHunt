@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Account - TalentHunt</title>
+    <meta name="description" content="Register as a participant or judge on TalentHunt platform." />
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <!-- Custom CSS -->
+    <link href="/css/style.css" rel="stylesheet" />
+  </head>
+  <body class="bg-body-tertiary">
+    <!-- Navbar Container -->
+    <div id="main-navbar"></div>
+
+    <main class="auth-split-wrapper">
+      <div class="auth-card">
+        <div class="row g-0">
+          <!-- Gradient Side Panel -->
+          <div class="col-lg-5 auth-sidebar d-none d-lg-flex">
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-4">
+                <i class="bi bi-stars text-warning fs-3"></i>
+                <h3 class="mb-0 fw-bold">TalentHunt</h3>
+              </div>
+              <h2 class="display-6 fw-bold mb-3">Begin Your Journey</h2>
+              <p class="text-white-50 lead fs-6">
+                Register to showcase your distinct talents or participate as an expert faculty judge.
+              </p>
+              <ul class="list-unstyled text-white-50 small mt-4 d-flex flex-column gap-2">
+                <li><i class="bi bi-check2-circle text-warning me-2"></i>Compete across arts, music, code & design</li>
+                <li><i class="bi bi-check2-circle text-warning me-2"></i>Receive structured evaluations and feedback</li>
+                <li><i class="bi bi-check2-circle text-warning me-2"></i>Live public standings & awards</li>
+              </ul>
+            </div>
+            <div class="pt-4 border-top border-white border-opacity-25 text-white-50 small">
+              <div>Secure registration • College Project Edition</div>
+            </div>
+          </div>
+
+          <!-- Form Side Panel -->
+          <div class="col-lg-7 p-4 p-md-5 d-flex flex-column justify-content-center">
+            <div class="max-w-md mx-auto w-100">
+              <div class="mb-4">
+                <h2 class="h3 fw-bold mb-1">Create Account</h2>
+                <p class="text-secondary small">Fill in the registration details to join the platform.</p>
+              </div>
+
+              <!-- General Alert -->
+              <div id="register-alert" class="alert alert-danger d-none py-2 px-3 small" role="alert"></div>
+
+              <form id="register-form" novalidate>
+                <!-- Full Name -->
+                <div class="mb-3">
+                  <label for="reg-name" class="form-label fw-semibold small">Full Name</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    <input type="text" class="form-control" id="reg-name" placeholder="e.g. Maya Patel" required autocomplete="name" />
+                  </div>
+                  <div class="invalid-feedback">Please enter your full name.</div>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                  <label for="reg-email" class="form-label fw-semibold small">Email Address</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                    <input type="email" class="form-control" id="reg-email" placeholder="name@college.edu" required autocomplete="email" />
+                  </div>
+                  <div class="invalid-feedback">Please enter a valid email address.</div>
+                </div>
+
+                <!-- Role Selection -->
+                <div class="mb-3">
+                  <label class="form-label fw-semibold small d-block">Register As</label>
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <input type="radio" class="btn-check" name="role" id="role-participant" value="participant" checked autocomplete="off">
+                      <label class="btn btn-outline-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2 fw-semibold" for="role-participant">
+                        <i class="bi bi-person-workspace"></i> Participant
+                      </label>
+                    </div>
+                    <div class="col-6">
+                      <input type="radio" class="btn-check" name="role" id="role-judge" value="judge" autocomplete="off">
+                      <label class="btn btn-outline-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2 fw-semibold" for="role-judge">
+                        <i class="bi bi-award"></i> Judge
+                      </label>
+                    </div>
+                  </div>
+                  <!-- Judge Approval Note -->
+                  <div id="judge-note" class="alert alert-warning py-2 px-3 mt-2 small d-none">
+                    <i class="bi bi-info-circle-fill me-1"></i>
+                    <strong>Needs admin approval:</strong> Judge registrations must be verified by faculty administrators before logging in.
+                  </div>
+                </div>
+
+                <!-- Password with Show/Hide and Strength Meter -->
+                <div class="mb-3">
+                  <label for="reg-password" class="form-label fw-semibold small">Password</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    <input type="password" class="form-control" id="reg-password" placeholder="At least 8 characters with letter & number" required autocomplete="new-password" />
+                    <button class="btn btn-outline-secondary" type="button" id="toggle-reg-password" title="Show/Hide password">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                  </div>
+                  <!-- Strength Meter Bar -->
+                  <div class="strength-meter-bar">
+                    <div class="strength-meter-fill" id="strength-fill"></div>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mt-1">
+                    <span class="text-secondary small" style="font-size: 0.78rem;">Strength: <strong id="strength-label">None</strong></span>
+                    <span class="text-muted small" style="font-size: 0.75rem;">Min. 8 chars, 1 letter & 1 digit</span>
+                  </div>
+                  <div class="invalid-feedback">Password must be at least 8 characters with at least one letter and one number.</div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="mb-4">
+                  <label for="reg-confirm-password" class="form-label fw-semibold small">Confirm Password</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-shield-check"></i></span>
+                    <input type="password" class="form-control" id="reg-confirm-password" placeholder="Re-type your password" required autocomplete="new-password" />
+                  </div>
+                  <div class="invalid-feedback">Passwords do not match.</div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-th-primary py-2 fw-semibold" id="reg-submit-btn">
+                    Create Account
+                  </button>
+                </div>
+              </form>
+
+              <div class="text-center mt-4 pt-2 border-top">
+                <p class="small text-secondary mb-0">
+                  Already have an account? 
+                  <a href="login.html" class="fw-bold text-primary text-decoration-none">Sign in</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="th-footer mt-auto">
+      <div class="container-xl text-center">
+        <p class="mb-0 small text-secondary">TalentHunt &copy; 2026. Online Talent Hunt and Competition Management Platform.</p>
+      </div>
+    </footer>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core App JS -->
+    <script src="/js/app.js"></script>
+    <script>
+      onReady(() => {
+        renderNav('register');
+
+        // Check if already logged in
+        if (getCurrentUser()) {
+          window.location.href = 'dashboard.html';
+          return;
+        }
+
+        const roleInputs = document.querySelectorAll('input[name="role"]');
+        const judgeNote = document.getElementById('judge-note');
+        roleInputs.forEach(input => {
+          input.addEventListener('change', () => {
+            if (input.value === 'judge' && input.checked) {
+              judgeNote.classList.remove('d-none');
+            } else {
+              judgeNote.classList.add('d-none');
+            }
+          });
+        });
+
+        // Password Show/Hide Toggle
+        const pwdInput = document.getElementById('reg-password');
+        const toggleBtn = document.getElementById('toggle-reg-password');
+        toggleBtn.addEventListener('click', () => {
+          if (pwdInput.type === 'password') {
+            pwdInput.type = 'text';
+            toggleBtn.innerHTML = '<i class="bi bi-eye-slash"></i>';
+          } else {
+            pwdInput.type = 'password';
+            toggleBtn.innerHTML = '<i class="bi bi-eye"></i>';
+          }
+        });
+
+        // Password Strength Meter Listener
+        const strengthFill = document.getElementById('strength-fill');
+        const strengthLabel = document.getElementById('strength-label');
+        pwdInput.addEventListener('input', () => {
+          const val = pwdInput.value;
+          const { score, label, class: className } = calculatePasswordStrength(val);
+          strengthFill.className = 'strength-meter-fill ' + className;
+          strengthLabel.textContent = label;
+          if (score === 1) strengthLabel.className = 'text-danger fw-bold';
+          else if (score === 2) strengthLabel.className = 'text-warning fw-bold';
+          else if (score === 3) strengthLabel.className = 'text-primary fw-bold';
+          else if (score === 4) strengthLabel.className = 'text-success fw-bold';
+          else strengthLabel.className = 'text-muted';
+        });
+
+        // Form Submit
+        const form = document.getElementById('register-form');
+        const submitBtn = document.getElementById('reg-submit-btn');
+        const alertBox = document.getElementById('register-alert');
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          clearInvalid(form);
+          alertBox.classList.add('d-none');
+          alertBox.textContent = '';
+
+          const nameInput = document.getElementById('reg-name');
+          const emailInput = document.getElementById('reg-email');
+          const confirmInput = document.getElementById('reg-confirm-password');
+          const selectedRole = document.querySelector('input[name="role"]:checked')?.value || 'participant';
+
+          const nameVal = nameInput.value.trim();
+          const emailVal = emailInput.value.trim();
+          const pwdVal = pwdInput.value;
+          const confirmVal = confirmInput.value;
+
+          let hasError = false;
+          if (!nameVal) {
+            markInvalid(nameInput, 'Full name is required.');
+            hasError = true;
+          }
+          if (!emailVal || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+            markInvalid(emailInput, 'Please provide a valid email address.');
+            hasError = true;
+          }
+          if (pwdVal.length < 8 || !/[A-Za-z]/.test(pwdVal) || !/[0-9]/.test(pwdVal)) {
+            markInvalid(pwdInput, 'Password must be at least 8 characters with at least one letter and one number.');
+            hasError = true;
+          }
+          if (pwdVal !== confirmVal) {
+            markInvalid(confirmInput, 'Passwords do not match.');
+            hasError = true;
+          }
+          if (hasError) return;
+
+          setBtnLoading(submitBtn, true);
+
+          try {
+            const res = await api('/auth/register', 'POST', {
+              name: nameVal,
+              email: emailVal,
+              password: pwdVal,
+              role: selectedRole
+            });
+
+            if (res.requiresApproval) {
+              showToast(res.message, 'warning');
+              sessionStorage.setItem('th_flash_msg', JSON.stringify({
+                message: 'Registration received! Judge accounts require admin approval before login.',
+                type: 'info'
+              }));
+              setTimeout(() => {
+                window.location.href = 'login.html';
+              }, 1200);
+            } else {
+              localStorage.setItem(STORAGE_KEY_TOKEN, res.token);
+              localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(res.user));
+              updateActivity();
+              showToast('Account created successfully! Welcome to TalentHunt.', 'success');
+              setTimeout(() => {
+                window.location.href = 'dashboard.html';
+              }, 600);
+            }
+
+          } catch (err) {
+            setBtnLoading(submitBtn, false);
+            const msg = (err && err.message) || 'Registration failed. Please verify your details.';
+            alertBox.textContent = msg;
+            alertBox.classList.remove('d-none');
+            showToast(msg, 'danger');
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

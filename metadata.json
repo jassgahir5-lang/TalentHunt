@@ -1,0 +1,6 @@
+{
+  "name": "TalentHunt",
+  "description": "Online Talent Hunt and Competition Management Platform: manage competitions, participant registrations, submissions, judging, and live leaderboards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

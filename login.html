@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Log In - TalentHunt</title>
+    <meta name="description" content="Sign in to your TalentHunt account to manage or participate in competitions." />
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <!-- Custom CSS -->
+    <link href="/css/style.css" rel="stylesheet" />
+  </head>
+  <body class="bg-body-tertiary">
+    <!-- Navbar Container -->
+    <div id="main-navbar"></div>
+
+    <main class="auth-split-wrapper">
+      <div class="auth-card">
+        <div class="row g-0">
+          <!-- Gradient Side Panel -->
+          <div class="col-lg-5 auth-sidebar d-none d-lg-flex">
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-4">
+                <i class="bi bi-stars text-warning fs-3"></i>
+                <h3 class="mb-0 fw-bold">TalentHunt</h3>
+              </div>
+              <h2 class="display-6 fw-bold mb-3">Welcome Back!</h2>
+              <p class="text-white-50 lead fs-6">
+                Step into your dedicated portal. Review ongoing challenges, check evaluation feedback, or judge submissions in real time.
+              </p>
+            </div>
+            <div class="pt-4 border-top border-white border-opacity-25 text-white-50 small">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="bi bi-shield-lock-fill text-warning"></i>
+                <span>Secure SHA-256 Authentication</span>
+              </div>
+              <div>College Talent & Competition Management System</div>
+            </div>
+          </div>
+
+          <!-- Form Side Panel -->
+          <div class="col-lg-7 p-4 p-md-5 d-flex flex-column justify-content-center">
+            <div class="max-w-md mx-auto w-100">
+              <div class="mb-4">
+                <h2 class="h3 fw-bold mb-1">Sign In to Your Account</h2>
+                <p class="text-secondary small">Enter your registered email and password below.</p>
+              </div>
+
+              <!-- General Error Alert -->
+              <div id="login-alert" class="alert alert-danger d-none py-2 px-3 small" role="alert"></div>
+
+              <form id="login-form" novalidate>
+                <!-- Email -->
+                <div class="mb-3">
+                  <label for="login-email" class="form-label fw-semibold small">Email Address</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                    <input type="email" class="form-control" id="login-email" placeholder="name@college.edu" required autocomplete="email" />
+                  </div>
+                  <div class="invalid-feedback">Please enter a valid email address.</div>
+                </div>
+
+                <!-- Password with Show/Hide -->
+                <div class="mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label for="login-password" class="form-label fw-semibold small mb-0">Password</label>
+                    <a href="forgot-password.html" class="small text-decoration-none text-primary fw-medium">Forgot password?</a>
+                  </div>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-key"></i></span>
+                    <input type="password" class="form-control" id="login-password" placeholder="Enter your password" required autocomplete="current-password" />
+                    <button class="btn btn-outline-secondary" type="button" id="toggle-password" title="Show/Hide password">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                  </div>
+                  <div class="invalid-feedback">Password is required.</div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="d-grid mt-4">
+                  <button type="submit" class="btn btn-th-primary py-2 fw-semibold" id="login-submit-btn">
+                    Sign In
+                  </button>
+                </div>
+              </form>
+
+              <div class="text-center mt-4 pt-2 border-top">
+                <p class="small text-secondary mb-0">
+                  Don't have an account yet? 
+                  <a href="register.html" class="fw-bold text-primary text-decoration-none">Create account</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="th-footer mt-auto">
+      <div class="container-xl text-center">
+        <p class="mb-0 small text-secondary">TalentHunt &copy; 2026. Online Talent Hunt and Competition Management Platform.</p>
+      </div>
+    </footer>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core App JS -->
+    <script src="/js/app.js"></script>
+    <script>
+      onReady(() => {
+        renderNav('login');
+
+        // Check if already logged in
+        const existing = getCurrentUser();
+        if (existing) {
+          window.location.href = 'dashboard.html';
+          return;
+        }
+
+        // Check expired param in URL
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('expired') === '1') {
+          showToast('Session expired, please log in again', 'warning');
+        }
+
+        // Password Show/Hide Toggle
+        const pwdInput = document.getElementById('login-password');
+        const toggleBtn = document.getElementById('toggle-password');
+        toggleBtn.addEventListener('click', () => {
+          if (pwdInput.type === 'password') {
+            pwdInput.type = 'text';
+            toggleBtn.innerHTML = '<i class="bi bi-eye-slash"></i>';
+          } else {
+            pwdInput.type = 'password';
+            toggleBtn.innerHTML = '<i class="bi bi-eye"></i>';
+          }
+        });
+
+        // Form Submit
+        const form = document.getElementById('login-form');
+        const submitBtn = document.getElementById('login-submit-btn');
+        const alertBox = document.getElementById('login-alert');
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          clearInvalid(form);
+          alertBox.classList.add('d-none');
+          alertBox.textContent = '';
+
+          const emailInput = document.getElementById('login-email');
+          const emailVal = emailInput.value.trim();
+          const pwdVal = pwdInput.value;
+
+          let hasError = false;
+          if (!emailVal || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+            markInvalid(emailInput, 'Please provide a valid email address.');
+            hasError = true;
+          }
+          if (!pwdVal) {
+            markInvalid(pwdInput, 'Password is required.');
+            hasError = true;
+          }
+          if (hasError) return;
+
+          setBtnLoading(submitBtn, true);
+
+          try {
+            const res = await api('/auth/login', 'POST', {
+              email: emailVal,
+              password: pwdVal
+            });
+
+            localStorage.setItem(STORAGE_KEY_TOKEN, res.token);
+            localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(res.user));
+            updateActivity();
+
+            showToast('Welcome back, ' + res.user.name + '!', 'success');
+
+            const redirectTarget = params.get('redirect') ? decodeURIComponent(params.get('redirect')) : 'dashboard.html';
+            setTimeout(() => {
+              window.location.href = redirectTarget;
+            }, 400);
+
+          } catch (err) {
+            setBtnLoading(submitBtn, false);
+            const msg = (err && err.message) || 'Invalid email or password.';
+            alertBox.textContent = msg;
+            alertBox.classList.remove('d-none');
+            showToast(msg, 'danger');
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

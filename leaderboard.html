@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leaderboard & Standings - TalentHunt</title>
+    <meta name="description" content="Official podium standings and live ranking leaderboards for all competitions." />
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <!-- Chart.js 4 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <!-- Custom CSS -->
+    <link href="/css/style.css" rel="stylesheet" />
+  </head>
+  <body class="bg-body-tertiary">
+    <!-- Navbar Container -->
+    <div id="main-navbar"></div>
+
+    <main class="py-4 py-lg-5">
+      <div class="container-xl">
+        <!-- Header & Competition Select -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+          <div>
+            <h1 class="h2 fw-bold mb-1">Standings & Leaderboard</h1>
+            <p class="text-secondary mb-0 small">Official podium rankings, verified judging tallies, and performance analytics.</p>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <label for="leaderboard-comp-select" class="small fw-semibold text-secondary text-nowrap mb-0">Select Event:</label>
+            <select id="leaderboard-comp-select" class="form-select" style="min-width: 250px;">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Leaderboard Body Area -->
+        <div id="leaderboard-view">
+          <!-- Loading skeleton -->
+          <div class="card card-th p-4">
+            <div class="skeleton-line mb-3" style="width: 40%"></div>
+            <div class="skeleton-line mb-2" style="width: 100%"></div>
+            <div class="skeleton-line mb-2" style="width: 80%"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="th-footer mt-auto">
+      <div class="container-xl text-center">
+        <p class="mb-0 small text-secondary">TalentHunt &copy; 2026. Online Talent Hunt and Competition Management Platform.</p>
+      </div>
+    </footer>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core App JS -->
+    <script src="/js/app.js"></script>
+    <script>
+      let competitions = [];
+      let currentChartInstance = null;
+      let currentUser = null;
+
+      onReady(async () => {
+        renderNav('leaderboard');
+        currentUser = getCurrentUser();
+
+        try {
+          competitions = await api('/competitions');
+          const select = document.getElementById('leaderboard-comp-select');
+
+          if (competitions.length === 0) {
+            document.getElementById('leaderboard-view').innerHTML = `
+              <div class="card card-th-static empty-state">
+                <i class="bi bi-trophy empty-state-icon"></i>
+                <h4 class="fw-bold">No Competitions Found</h4>
+                <p class="text-secondary">There are no competitions available on the platform yet.</p>
+              </div>
+            `;
+            return;
+          }
+
+          select.innerHTML = competitions.map(c => {
+            const isPub = c.status === 'Published';
+            return `<option value="${c.id}" ${isPub ? 'selected' : ''}>${esc(c.title)} (${c.status})</option>`;
+          }).join('');
+
+          // Prefer published competition first, if none, first one
+          const preferredComp = competitions.find(c => c.status === 'Published') || competitions[0];
+          select.value = preferredComp.id;
+
+          select.addEventListener('change', (e) => {
+            loadLeaderboard(e.target.value);
+          });
+
+          await loadLeaderboard(preferredComp.id);
+        } catch (err) {
+          showToast((err && err.message) || 'Error loading competitions list', 'danger');
+        }
+      });
+
+      async function loadLeaderboard(compId) {
+        const view = document.getElementById('leaderboard-view');
+        view.innerHTML = '<div class="card card-th p-5 text-center text-secondary">Loading leaderboard rankings...</div>';
+
+        try {
+          const res = await api(`/competitions/${compId}/leaderboard`);
+          renderLeaderboard(res);
+        } catch (err) {
+          view.innerHTML = `
+            <div class="card card-th-static empty-state">
+              <i class="bi bi-shield-lock empty-state-icon text-warning"></i>
+              <h4 class="fw-bold">Results Not Available</h4>
+              <p class="text-secondary max-w-md mx-auto mb-0">${(err && err.message) || 'Standings are not yet published for this competition.'}</p>
+            </div>
+          `;
+        }
+      }
+
+      function renderLeaderboard(data) {
+        const view = document.getElementById('leaderboard-view');
+        const rankings = data.rankings || [];
+        const comp = data.competition;
+        const isProvisional = data.isProvisional;
+
+        if (rankings.length === 0) {
+          view.innerHTML = `
+            <div class="card card-th-static empty-state">
+              <i class="bi bi-hourglass-split empty-state-icon text-secondary"></i>
+              <h4 class="fw-bold">${isProvisional ? 'Judging In Progress' : 'No Evaluated Entries'}</h4>
+              <p class="text-secondary max-w-md mx-auto mb-3">
+                ${data.message || 'Results have not yet been evaluated by judges or published for this competition.'}
+              </p>
+              ${isProvisional && currentUser && (currentUser.role === 'admin' || currentUser.role === 'judge') ? `
+                <span class="badge bg-warning-subtle text-warning-emphasis px-3 py-2">
+                  <i class="bi bi-shield-exclamation me-1"></i>Provisional: Awaiting complete scoring or admin publishing
+                </span>
+              ` : ''}
+            </div>
+          `;
+          return;
+        }
+
+        // Top 3 Podium
+        const first = rankings[0];
+        const second = rankings[1];
+        const third = rankings[2];
+
+        const podiumHtml = `
+          <div class="podium-container">
+            <!-- 2nd Place (Silver) -->
+            <div class="podium-step">
+              ${second ? `
+                <div class="podium-avatar text-secondary">
+                  <i class="bi bi-award-fill"></i>
+                </div>
+                <div class="fw-bold text-truncate w-100 px-1" title="${esc(second.participantName)}">${esc(second.participantName)}</div>
+                <div class="small text-muted text-truncate w-100 px-1 mb-2">${esc(second.title)}</div>
+                <div class="podium-card podium-silver">
+                  <div class="display-6 fw-bold">2</div>
+                  <div class="fs-6">${second.averageScore} / 30</div>
+                </div>
+              ` : '<div class="text-muted small py-4">No 2nd Place</div>'}
+            </div>
+
+            <!-- 1st Place (Gold) -->
+            <div class="podium-step">
+              ${first ? `
+                <div class="podium-avatar text-warning">
+                  <i class="bi bi-trophy-fill"></i>
+                </div>
+                <div class="fw-bold text-truncate w-100 px-1 fs-5" title="${esc(first.participantName)}">${esc(first.participantName)}</div>
+                <div class="small text-muted text-truncate w-100 px-1 mb-2">${esc(first.title)}</div>
+                <div class="podium-card podium-gold">
+                  <div class="display-5 fw-bold">1</div>
+                  <div class="fs-5">${first.averageScore} / 30</div>
+                </div>
+              ` : ''}
+            </div>
+
+            <!-- 3rd Place (Bronze) -->
+            <div class="podium-step">
+              ${third ? `
+                <div class="podium-avatar text-warning-emphasis">
+                  <i class="bi bi-award"></i>
+                </div>
+                <div class="fw-bold text-truncate w-100 px-1" title="${esc(third.participantName)}">${esc(third.participantName)}</div>
+                <div class="small text-muted text-truncate w-100 px-1 mb-2">${esc(third.title)}</div>
+                <div class="podium-card podium-bronze">
+                  <div class="display-6 fw-bold">3</div>
+                  <div class="fs-6">${third.averageScore} / 30</div>
+                </div>
+              ` : '<div class="text-muted small py-4">No 3rd Place</div>'}
+            </div>
+          </div>
+        `;
+
+        // Ranking Table Rows
+        const rowsHtml = rankings.map(item => {
+          let rankBadge = '';
+          if (item.rank === 1) rankBadge = '<span class="badge bg-warning text-dark px-2 py-1"><i class="bi bi-trophy-fill me-1"></i>1st</span>';
+          else if (item.rank === 2) rankBadge = '<span class="badge bg-secondary text-white px-2 py-1"><i class="bi bi-award-fill me-1"></i>2nd</span>';
+          else if (item.rank === 3) rankBadge = '<span class="badge text-white px-2 py-1" style="background-color: #d97706;"><i class="bi bi-award me-1"></i>3rd</span>';
+          else rankBadge = `<span class="badge bg-light text-dark border px-2 py-1 fw-bold">#${item.rank}</span>`;
+
+          return `
+            <tr>
+              <td>${rankBadge}</td>
+              <td class="fw-bold">${esc(item.participantName)}</td>
+              <td>
+                <div class="fw-semibold text-body-emphasis">${esc(item.title)}</div>
+                ${item.link ? `<a href="${esc(item.link)}" target="_blank" rel="noopener noreferrer" class="small text-primary text-decoration-none"><i class="bi bi-box-arrow-up-right me-1"></i>View Work</a>` : ''}
+              </td>
+              <td>
+                <span class="badge bg-secondary-subtle text-secondary">${item.judgesCount} Score(s)</span>
+              </td>
+              <td>
+                <span class="fs-5 fw-bold text-primary">${item.averageScore}</span>
+                <span class="text-muted small"> / 30</span>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        view.innerHTML = `
+          <!-- Notice Banner -->
+          <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded-3 ${isProvisional ? 'bg-warning-subtle text-warning-emphasis border border-warning' : 'bg-success-subtle text-success-emphasis border border-success'}">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi ${isProvisional ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill'} fs-5"></i>
+              <div>
+                <strong>${esc(comp.title)}</strong> &bull; 
+                ${isProvisional ? 'Provisional Standings (Subject to faculty admin publishing)' : 'Official Final Results Published'}
+              </div>
+            </div>
+            <span class="badge ${isProvisional ? 'bg-warning text-dark' : 'bg-success text-white'} px-2 py-1">
+              ${isProvisional ? 'Provisional' : 'Official Results'}
+            </span>
+          </div>
+
+          <!-- Podium Area -->
+          <div class="card card-th-static p-4 mb-4">
+            <h4 class="h5 fw-bold text-center mb-4"><i class="bi bi-stars text-warning me-2"></i>Champions Podium</h4>
+            ${podiumHtml}
+          </div>
+
+          <!-- Analytics & Detailed Ranking Table -->
+          <div class="row g-4 mb-4">
+            <!-- Horizontal Bar Chart -->
+            <div class="col-lg-6">
+              <div class="card card-th-static h-100 p-4">
+                <h5 class="fw-bold mb-3">Score Distribution (Top Performers)</h5>
+                <div style="position: relative; height: 320px;">
+                  <canvas id="leaderboardBarChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Full Standings Table -->
+            <div class="col-lg-6">
+              <div class="card card-th-static h-100 p-0 overflow-hidden shadow-sm">
+                <div class="p-3 border-bottom bg-body-tertiary">
+                  <h5 class="fw-bold mb-0">Complete Rankings</h5>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                      <tr class="small text-secondary">
+                        <th>Rank</th>
+                        <th>Participant</th>
+                        <th>Entry Title</th>
+                        <th>Judges</th>
+                        <th>Average</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${rowsHtml}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Render Chart.js Horizontal Bar
+        setTimeout(() => {
+          const chartCtx = document.getElementById('leaderboardBarChart')?.getContext('2d');
+          if (chartCtx) {
+            if (currentChartInstance) currentChartInstance.destroy();
+
+            const chartRankings = rankings.slice(0, 7);
+            currentChartInstance = new Chart(chartCtx, {
+              type: 'bar',
+              data: {
+                labels: chartRankings.map(r => r.participantName),
+                datasets: [{
+                  label: 'Average Score (/30)',
+                  data: chartRankings.map(r => r.averageScore),
+                  backgroundColor: ['#f59e0b', '#94a3b8', '#d97706', '#4f46e5', '#3b82f6', '#10b981', '#8b5cf6'].slice(0, chartRankings.length),
+                  borderRadius: 6
+                }]
+              },
+              options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  x: { max: 30, beginAtZero: true }
+                },
+                plugins: {
+                  legend: { display: false }
+                }
+              }
+            });
+          }
+        }, 50);
+      }
+    </script>
+  </body>
+</html>

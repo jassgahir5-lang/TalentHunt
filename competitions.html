@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Competitions - TalentHunt</title>
+    <meta name="description" content="Explore and register for student talent and technical competitions." />
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <!-- Custom CSS -->
+    <link href="/css/style.css" rel="stylesheet" />
+  </head>
+  <body class="bg-body-tertiary">
+    <!-- Navbar Container -->
+    <div id="main-navbar"></div>
+
+    <main class="py-4 py-lg-5">
+      <div class="container-xl">
+        <!-- Title & Action Bar -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+          <div>
+            <h1 class="h2 fw-bold mb-1">Competitions & Events</h1>
+            <p class="text-secondary mb-0 small">Browse current showcases, register your participation, or view rules and judging panels.</p>
+          </div>
+          <div id="admin-actions-container">
+            <!-- New Competition button injected if admin -->
+          </div>
+        </div>
+
+        <!-- Filters & Search Toolbar -->
+        <div class="card card-th-static p-3 mb-4">
+          <div class="row g-3 align-items-center">
+            <!-- Search -->
+            <div class="col-md-5">
+              <div class="input-group">
+                <span class="input-group-text bg-body border-end-0"><i class="bi bi-search text-secondary"></i></span>
+                <input type="text" class="form-control border-start-0" id="filter-search" placeholder="Search by title or description..." />
+              </div>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="col-sm-6 col-md-3">
+              <select class="form-select" id="filter-category">
+                <option value="all">All Categories</option>
+                <option value="Singing">Singing</option>
+                <option value="Dancing">Dancing</option>
+                <option value="Coding">Coding</option>
+                <option value="Art & Design">Art & Design</option>
+                <option value="Writing">Writing</option>
+                <option value="Quiz">Quiz</option>
+                <option value="Photography">Photography</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <!-- Status Filter -->
+            <div class="col-sm-6 col-md-3">
+              <select class="form-select" id="filter-status">
+                <option value="all">All Statuses</option>
+                <option value="Open">Open for Registration</option>
+                <option value="Closed">Closed</option>
+                <option value="Published">Results Published</option>
+              </select>
+            </div>
+
+            <!-- Reset Filters -->
+            <div class="col-md-1 text-md-end">
+              <button class="btn btn-outline-secondary w-100" id="filter-reset-btn" title="Reset Filters">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Competitions Grid -->
+        <div class="row g-4" id="competitions-grid">
+          <!-- Loading Skeletons -->
+          <div class="col-md-6 col-lg-4">
+            <div class="card card-th p-4">
+              <div class="skeleton-line mb-3" style="width: 40%"></div>
+              <div class="skeleton-line mb-2" style="width: 80%"></div>
+              <div class="skeleton-line mb-4" style="width: 60%"></div>
+              <div class="skeleton-line" style="width: 100%; height: 40px;"></div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="card card-th p-4">
+              <div class="skeleton-line mb-3" style="width: 40%"></div>
+              <div class="skeleton-line mb-2" style="width: 80%"></div>
+              <div class="skeleton-line mb-4" style="width: 60%"></div>
+              <div class="skeleton-line" style="width: 100%; height: 40px;"></div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="card card-th p-4">
+              <div class="skeleton-line mb-3" style="width: 40%"></div>
+              <div class="skeleton-line mb-2" style="width: 80%"></div>
+              <div class="skeleton-line mb-4" style="width: 60%"></div>
+              <div class="skeleton-line" style="width: 100%; height: 40px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Details Modal -->
+    <div class="modal fade" id="details-modal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content card-th-static">
+          <div class="modal-header">
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-secondary-subtle text-secondary small" id="detail-category-badge">Category</span>
+                <span class="badge" id="detail-status-badge">Status</span>
+              </div>
+              <h4 class="modal-title fw-bold" id="detail-title">Competition Details</h4>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-4">
+              <h6 class="fw-bold text-uppercase text-secondary small">Description</h6>
+              <p id="detail-desc" class="text-body-emphasis mb-0"></p>
+            </div>
+
+            <div class="mb-4">
+              <h6 class="fw-bold text-uppercase text-secondary small">Official Guidelines & Rules</h6>
+              <div class="bg-body-secondary p-3 rounded-3" style="white-space: pre-line;" id="detail-rules"></div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-sm-6">
+                <div class="p-3 border rounded-3">
+                  <div class="text-secondary small">Registration Deadline</div>
+                  <div class="fw-bold text-body-emphasis" id="detail-reg-deadline">-</div>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="p-3 border rounded-3">
+                  <div class="text-secondary small">Submission Deadline</div>
+                  <div class="fw-bold text-body-emphasis" id="detail-sub-deadline">-</div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h6 class="fw-bold text-uppercase text-secondary small">Assigned Judging Panel</h6>
+              <div id="detail-judges-list" class="d-flex flex-wrap gap-2"></div>
+            </div>
+          </div>
+          <div class="modal-footer" id="detail-modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create / Edit Competition Modal (Admin) -->
+    <div class="modal fade" id="comp-form-modal" tabindex="-1" aria-labelledby="compFormLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content card-th-static">
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold" id="compFormLabel">Create Competition</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form id="comp-form" novalidate>
+            <input type="hidden" id="comp-id" value="" />
+            <div class="modal-body">
+              <div class="row g-3">
+                <div class="col-md-8">
+                  <label for="comp-title-input" class="form-label small fw-semibold">Event Title</label>
+                  <input type="text" class="form-control" id="comp-title-input" placeholder="e.g. Solo Classical Singing" required />
+                  <div class="invalid-feedback">Event title is required.</div>
+                </div>
+                <div class="col-md-4">
+                  <label for="comp-cat-input" class="form-label small fw-semibold">Category</label>
+                  <select class="form-select" id="comp-cat-input" required>
+                    <option value="Singing">Singing</option>
+                    <option value="Dancing">Dancing</option>
+                    <option value="Coding">Coding</option>
+                    <option value="Art & Design">Art & Design</option>
+                    <option value="Writing">Writing</option>
+                    <option value="Quiz">Quiz</option>
+                    <option value="Photography">Photography</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label for="comp-desc-input" class="form-label small fw-semibold">Description</label>
+                  <textarea class="form-control" id="comp-desc-input" rows="3" placeholder="Overview and scope of the event..." required></textarea>
+                  <div class="invalid-feedback">Description is required.</div>
+                </div>
+                <div class="col-12">
+                  <label for="comp-rules-input" class="form-label small fw-semibold">Rules & Submission Specifications</label>
+                  <textarea class="form-control" id="comp-rules-input" rows="4" placeholder="Numbered rules, file links, time constraints..." required></textarea>
+                  <div class="invalid-feedback">Rules are required.</div>
+                </div>
+                <div class="col-md-6">
+                  <label for="comp-reg-date" class="form-label small fw-semibold">Registration Deadline</label>
+                  <input type="date" class="form-control" id="comp-reg-date" required />
+                  <div class="invalid-feedback">Valid registration deadline required.</div>
+                </div>
+                <div class="col-md-6">
+                  <label for="comp-sub-date" class="form-label small fw-semibold">Submission Deadline</label>
+                  <input type="date" class="form-control" id="comp-sub-date" required />
+                  <div class="invalid-feedback">Submission deadline cannot be before registration deadline.</div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-th-primary" id="comp-save-btn">Save Competition</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assign Judges Modal (Admin) -->
+    <div class="modal fade" id="assign-judges-modal" tabindex="-1" aria-labelledby="assignJudgesLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content card-th-static">
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold" id="assignJudgesLabel">Assign Judges</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form id="assign-judges-form">
+            <input type="hidden" id="assign-comp-id" value="" />
+            <div class="modal-body">
+              <p class="small text-secondary mb-3">
+                Select approved faculty judges who are authorized to evaluate and score entries for this competition.
+              </p>
+              <div id="judges-checkbox-list" class="d-flex flex-column gap-2">
+                <!-- Checkboxes injected dynamically -->
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-th-primary" id="assign-save-btn">Save Assignments</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="th-footer mt-auto">
+      <div class="container-xl text-center">
+        <p class="mb-0 small text-secondary">TalentHunt &copy; 2026. Online Talent Hunt and Competition Management Platform.</p>
+      </div>
+    </footer>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core App JS -->
+    <script src="/js/app.js"></script>
+    <script>
+      let allCompetitions = [];
+      let allJudges = [];
+      let currentUser = null;
+
+      onReady(async () => {
+        renderNav('competitions');
+        currentUser = getCurrentUser();
+
+        // Admin Action Button
+        if (currentUser && currentUser.role === 'admin') {
+          document.getElementById('admin-actions-container').innerHTML = `
+            <button class="btn btn-th-primary fw-semibold d-flex align-items-center gap-2" id="open-new-comp-modal">
+              <i class="bi bi-plus-circle"></i> Create Competition
+            </button>
+          `;
+          document.getElementById('open-new-comp-modal')?.addEventListener('click', () => {
+            openCompModal();
+          });
+        }
+
+        // Fetch Competitions & Judges
+        await loadData();
+
+        // Filters Listeners
+        document.getElementById('filter-search').addEventListener('input', applyFilters);
+        document.getElementById('filter-category').addEventListener('change', applyFilters);
+        document.getElementById('filter-status').addEventListener('change', applyFilters);
+        document.getElementById('filter-reset-btn').addEventListener('click', () => {
+          document.getElementById('filter-search').value = '';
+          document.getElementById('filter-category').value = 'all';
+          document.getElementById('filter-status').value = 'all';
+          applyFilters();
+        });
+
+        // Setup Form Handlers
+        setupCompForm();
+        setupAssignJudgesForm();
+      });
+
+      async function loadData() {
+        try {
+          allCompetitions = await api('/competitions');
+          if (currentUser && currentUser.role === 'admin') {
+            const users = await api('/users');
+            allJudges = users.filter(u => u.role === 'judge' && u.status === 'approved');
+          }
+          applyFilters();
+        } catch (err) {
+          showToast((err && err.message) || 'Error loading competitions', 'danger');
+        }
+      }
+
+      function applyFilters() {
+        const query = document.getElementById('filter-search').value.toLowerCase().trim();
+        const cat = document.getElementById('filter-category').value;
+        const status = document.getElementById('filter-status').value;
+
+        const filtered = allCompetitions.filter(c => {
+          const matchQuery = !query || c.title.toLowerCase().includes(query) || c.description.toLowerCase().includes(query);
+          const matchCat = cat === 'all' || c.category === cat;
+          const matchStatus = status === 'all' || c.status === status;
+          return matchQuery && matchCat && matchStatus;
+        });
+
+        renderGrid(filtered);
+      }
+
+      function renderGrid(competitions) {
+        const grid = document.getElementById('competitions-grid');
+        if (competitions.length === 0) {
+          grid.innerHTML = `
+            <div class="col-12">
+              <div class="empty-state card card-th-static">
+                <i class="bi bi-search empty-state-icon"></i>
+                <h5 class="fw-bold">No Competitions Found</h5>
+                <p class="text-secondary">Try adjusting your search criteria or resetting filters.</p>
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+
+        grid.innerHTML = competitions.map(c => {
+          const stripClass = getCategoryStripClass(c.category);
+          const catIcon = getCategoryIcon(c.category);
+
+          let statusBadgeClass = 'badge-status-open';
+          if (c.status === 'Closed') statusBadgeClass = 'badge-status-closed';
+          if (c.status === 'Published') statusBadgeClass = 'badge-status-published';
+
+          const regClosed = today > c.regDeadline || c.status !== 'Open';
+
+          let actionButtons = '';
+          if (currentUser && currentUser.role === 'admin') {
+            actionButtons = `
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Admin Manage
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow">
+                  <li><a class="dropdown-item" href="javascript:void(0)" onclick="openCompModal('${c.id}')"><i class="bi bi-pencil me-2"></i>Edit Details</a></li>
+                  <li><a class="dropdown-item" href="javascript:void(0)" onclick="openAssignModal('${c.id}')"><i class="bi bi-people me-2"></i>Assign Judges</a></li>
+                  <li>
+                    ${c.status === 'Open'
+                      ? `<a class="dropdown-item" href="javascript:void(0)" onclick="toggleCompStatus('${c.id}', 'Closed')"><i class="bi bi-lock me-2"></i>Close Event</a>`
+                      : c.status === 'Closed'
+                      ? `<a class="dropdown-item" href="javascript:void(0)" onclick="toggleCompStatus('${c.id}', 'Open')"><i class="bi bi-unlock me-2"></i>Reopen Event</a>`
+                      : ''
+                    }
+                  </li>
+                  ${c.status !== 'Published' ? `
+                    <li><a class="dropdown-item text-primary" href="javascript:void(0)" onclick="publishResults('${c.id}')"><i class="bi bi-award me-2"></i>Publish Results</a></li>
+                  ` : ''}
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="deleteCompetition('${c.id}', '${esc(c.title)}')"><i class="bi bi-trash me-2"></i>Delete Event</a></li>
+                </ul>
+              </div>
+            `;
+          } else if (currentUser && currentUser.role === 'participant') {
+            if (c.isRegistered) {
+              actionButtons = `
+                <a href="entries.html" class="btn btn-sm btn-success fw-semibold">
+                  <i class="bi bi-check-circle me-1"></i> Registered (View Entry)
+                </a>
+              `;
+            } else if (regClosed) {
+              actionButtons = `
+                <button class="btn btn-sm btn-secondary" disabled>
+                  Registration Closed
+                </button>
+              `;
+            } else {
+              actionButtons = `
+                <button class="btn btn-sm btn-th-primary fw-semibold" onclick="registerForComp('${c.id}')">
+                  Register Now
+                </button>
+              `;
+            }
+          } else if (!currentUser) {
+            actionButtons = `
+              <a href="login.html" class="btn btn-sm btn-outline-primary fw-semibold">
+                Sign in to Register
+              </a>
+            `;
+          }
+
+          return `
+            <div class="col-md-6 col-lg-4">
+              <div class="card card-th h-100 d-flex flex-column">
+                <div class="category-strip ${stripClass}"></div>
+                <div class="card-body p-4 d-flex flex-column">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-light text-dark border px-2 py-1 small fw-semibold">
+                      <i class="bi ${catIcon} me-1 text-primary"></i>${esc(c.category)}
+                    </span>
+                    <span class="badge ${statusBadgeClass} px-2 py-1 small">${esc(c.status)}</span>
+                  </div>
+
+                  <h3 class="h5 fw-bold mb-2">${esc(c.title)}</h3>
+                  <p class="text-secondary small mb-3 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                    ${esc(c.description)}
+                  </p>
+
+                  <div class="bg-body-secondary p-2 rounded-3 small mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                      <span class="text-secondary"><i class="bi bi-calendar-check me-1"></i>Reg Closes:</span>
+                      <span class="fw-semibold text-body-emphasis">${formatDate(c.regDeadline)}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <span class="text-secondary"><i class="bi bi-clock-history me-1"></i>Sub Deadline:</span>
+                      <span class="fw-semibold text-body-emphasis">${formatDate(c.subDeadline)}</span>
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-between text-secondary small mb-3">
+                    <span><i class="bi bi-people me-1"></i>${c.registeredCount || 0} Registered</span>
+                    <span><i class="bi bi-folder me-1"></i>${c.entriesCount || 0} Entries</span>
+                    <span><i class="bi bi-award me-1"></i>${c.judgesCount || 0} Judges</span>
+                  </div>
+
+                  <div class="border-top pt-3 mt-auto d-flex justify-content-between align-items-center gap-2">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="viewDetails('${c.id}')">
+                      <i class="bi bi-info-circle me-1"></i>Details
+                    </button>
+                    ${actionButtons}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function viewDetails(compId) {
+        const comp = allCompetitions.find(c => c.id === compId);
+        if (!comp) return;
+
+        document.getElementById('detail-title').textContent = comp.title;
+        document.getElementById('detail-desc').textContent = comp.description;
+        document.getElementById('detail-rules').textContent = comp.rules || 'No special rules provided.';
+        document.getElementById('detail-category-badge').textContent = comp.category;
+        
+        const statusBadge = document.getElementById('detail-status-badge');
+        statusBadge.textContent = comp.status;
+        statusBadge.className = `badge ${comp.status === 'Open' ? 'badge-status-open' : comp.status === 'Closed' ? 'badge-status-closed' : 'badge-status-published'}`;
+
+        document.getElementById('detail-reg-deadline').textContent = formatDate(comp.regDeadline);
+        document.getElementById('detail-sub-deadline').textContent = formatDate(comp.subDeadline);
+
+        const judgesContainer = document.getElementById('detail-judges-list');
+        if (!comp.judgeNames || comp.judgeNames.length === 0) {
+          judgesContainer.innerHTML = '<span class="text-muted small">No judges assigned yet.</span>';
+        } else {
+          judgesContainer.innerHTML = comp.judgeNames.map(j => `
+            <span class="badge bg-light text-dark border p-2">
+              <i class="bi bi-person-check-fill text-primary me-1"></i>${esc(j)}
+            </span>
+          `).join('');
+        }
+
+        const footer = document.getElementById('detail-modal-footer');
+        const today = new Date().toISOString().split('T')[0];
+        const canRegister = currentUser && currentUser.role === 'participant' && !comp.isRegistered && comp.status === 'Open' && today <= comp.regDeadline;
+
+        footer.innerHTML = `
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+          ${canRegister ? `<button type="button" class="btn btn-th-primary" onclick="registerForComp('${comp.id}')">Register for Event</button>` : ''}
+        `;
+
+        new bootstrap.Modal(document.getElementById('details-modal')).show();
+      }
+
+      async function registerForComp(compId) {
+        if (!currentUser) {
+          window.location.href = 'login.html';
+          return;
+        }
+        if (currentUser.role !== 'participant') {
+          showToast('Only participant accounts can register for competitions.', 'warning');
+          return;
+        }
+
+        try {
+          const res = await api(`/competitions/${compId}/register`, 'POST');
+          showToast(res.message || 'Registered successfully!', 'success');
+          
+          // Hide details modal if open
+          const modalEl = document.getElementById('details-modal');
+          const instance = bootstrap.Modal.getInstance(modalEl);
+          if (instance) instance.hide();
+
+          await loadData();
+        } catch (err) {
+          showToast((err && err.message) || 'Failed to register', 'danger');
+        }
+      }
+
+      // --- Admin Functions ---
+      function openCompModal(compId = null) {
+        const modal = new bootstrap.Modal(document.getElementById('comp-form-modal'));
+        const form = document.getElementById('comp-form');
+        clearInvalid(form);
+        form.reset();
+
+        const titleLabel = document.getElementById('compFormLabel');
+        const idInput = document.getElementById('comp-id');
+
+        if (compId) {
+          const comp = allCompetitions.find(c => c.id === compId);
+          if (!comp) return;
+          titleLabel.textContent = 'Edit Competition';
+          idInput.value = comp.id;
+          document.getElementById('comp-title-input').value = comp.title;
+          document.getElementById('comp-cat-input').value = comp.category;
+          document.getElementById('comp-desc-input').value = comp.description;
+          document.getElementById('comp-rules-input').value = comp.rules;
+          document.getElementById('comp-reg-date').value = comp.regDeadline;
+          document.getElementById('comp-sub-date').value = comp.subDeadline;
+        } else {
+          titleLabel.textContent = 'Create New Competition';
+          idInput.value = '';
+          // Defaults: reg date +7 days, sub date +14 days
+          const now = new Date();
+          const r = new Date(now.getTime() + 7 * 86400000).toISOString().split('T')[0];
+          const s = new Date(now.getTime() + 14 * 86400000).toISOString().split('T')[0];
+          document.getElementById('comp-reg-date').value = r;
+          document.getElementById('comp-sub-date').value = s;
+        }
+
+        modal.show();
+      }
+
+      function setupCompForm() {
+        const form = document.getElementById('comp-form');
+        const saveBtn = document.getElementById('comp-save-btn');
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          clearInvalid(form);
+
+          const compId = document.getElementById('comp-id').value;
+          const title = document.getElementById('comp-title-input').value.trim();
+          const category = document.getElementById('comp-cat-input').value;
+          const description = document.getElementById('comp-desc-input').value.trim();
+          const rules = document.getElementById('comp-rules-input').value.trim();
+          const regDeadline = document.getElementById('comp-reg-date').value;
+          const subDeadline = document.getElementById('comp-sub-date').value;
+
+          let hasErr = false;
+          if (!title) {
+            markInvalid(document.getElementById('comp-title-input'), 'Title is required');
+            hasErr = true;
+          }
+          if (!description) {
+            markInvalid(document.getElementById('comp-desc-input'), 'Description is required');
+            hasErr = true;
+          }
+          if (!rules) {
+            markInvalid(document.getElementById('comp-rules-input'), 'Rules are required');
+            hasErr = true;
+          }
+          if (!regDeadline) {
+            markInvalid(document.getElementById('comp-reg-date'), 'Registration deadline required');
+            hasErr = true;
+          }
+          if (!subDeadline || subDeadline < regDeadline) {
+            markInvalid(document.getElementById('comp-sub-date'), 'Submission deadline cannot be before registration deadline');
+            hasErr = true;
+          }
+          if (hasErr) return;
+
+          setBtnLoading(saveBtn, true);
+
+          try {
+            if (compId) {
+              await api(`/competitions/${compId}`, 'PUT', {
+                title, category, description, rules, regDeadline, subDeadline
+              });
+              showToast('Competition updated successfully!', 'success');
+            } else {
+              // Assign all approved judges by default to new competition
+              const judgeIds = allJudges.map(j => j.id);
+              await api('/competitions', 'POST', {
+                title, category, description, rules, regDeadline, subDeadline, assignedJudgeIds: judgeIds
+              });
+              showToast('Competition created successfully!', 'success');
+            }
+
+            setBtnLoading(saveBtn, false);
+            bootstrap.Modal.getInstance(document.getElementById('comp-form-modal')).hide();
+            await loadData();
+          } catch (err) {
+            setBtnLoading(saveBtn, false);
+            showToast((err && err.message) || 'Error saving competition', 'danger');
+          }
+        });
+      }
+
+      function openAssignModal(compId) {
+        const comp = allCompetitions.find(c => c.id === compId);
+        if (!comp) return;
+
+        document.getElementById('assign-comp-id').value = comp.id;
+        const listContainer = document.getElementById('judges-checkbox-list');
+
+        if (allJudges.length === 0) {
+          listContainer.innerHTML = '<div class="alert alert-warning small">No approved judges available in the system. Approve judge sign-ups in Users page first.</div>';
+        } else {
+          listContainer.innerHTML = allJudges.map(j => {
+            const isAssigned = (comp.assignedJudgeIds || []).includes(j.id);
+            return `
+              <div class="form-check p-2 rounded border">
+                <input class="form-check-input ms-0 me-2 judge-checkbox" type="checkbox" value="${j.id}" id="judge_${j.id}" ${isAssigned ? 'checked' : ''}>
+                <label class="form-check-label fw-semibold" for="judge_${j.id}">
+                  ${esc(j.name)} <span class="text-muted fw-normal">(${esc(j.email)})</span>
+                </label>
+              </div>
+            `;
+          }).join('');
+        }
+
+        new bootstrap.Modal(document.getElementById('assign-judges-modal')).show();
+      }
+
+      function setupAssignJudgesForm() {
+        const form = document.getElementById('assign-judges-form');
+        const saveBtn = document.getElementById('assign-save-btn');
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const compId = document.getElementById('assign-comp-id').value;
+          const selectedJudges = Array.from(document.querySelectorAll('.judge-checkbox:checked')).map(cb => cb.value);
+
+          setBtnLoading(saveBtn, true);
+          try {
+            await api(`/competitions/${compId}/judges`, 'PUT', { judgeIds: selectedJudges });
+            setBtnLoading(saveBtn, false);
+            bootstrap.Modal.getInstance(document.getElementById('assign-judges-modal')).hide();
+            showToast('Judges assigned successfully!', 'success');
+            await loadData();
+          } catch (err) {
+            setBtnLoading(saveBtn, false);
+            showToast((err && err.message) || 'Error assigning judges', 'danger');
+          }
+        });
+      }
+
+      async function toggleCompStatus(compId, newStatus) {
+        try {
+          await api(`/competitions/${compId}/status`, 'POST', { status: newStatus });
+          showToast(`Competition status changed to ${newStatus}.`, 'info');
+          await loadData();
+        } catch (err) {
+          showToast((err && err.message) || 'Error updating status', 'danger');
+        }
+      }
+
+      function publishResults(compId) {
+        showConfirmModal(
+          'Publish Competition Results?',
+          'Once published, all rankings and final scores will become publicly visible on the Leaderboard. Are you ready to publish?',
+          'Publish Results',
+          async () => {
+            try {
+              const res = await api(`/competitions/${compId}/publish`, 'POST');
+              showToast(res.message || 'Results published!', 'success');
+              await loadData();
+            } catch (err) {
+              showToast((err && err.message) || 'Cannot publish results. Ensure at least one entry has been scored.', 'danger');
+            }
+          }
+        );
+      }
+
+      function deleteCompetition(compId, title) {
+        showConfirmModal(
+          'Delete Competition',
+          `Are you sure you want to delete <strong>${title}</strong>?<br><br><span class="text-danger small"><i class="bi bi-exclamation-triangle-fill me-1"></i>Warning: All related registrations, participant entries, and judge scores will also be permanently deleted.</span>`,
+          'Delete Permanently',
+          async () => {
+            try {
+              await api(`/competitions/${compId}`, 'DELETE');
+              showToast('Competition deleted successfully.', 'info');
+              await loadData();
+            } catch (err) {
+              showToast((err && err.message) || 'Error deleting competition', 'danger');
+            }
+          }
+        );
+      }
+    </script>
+  </body>
+</html>

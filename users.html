@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Management - TalentHunt</title>
+    <meta name="description" content="Admin user and judge management." />
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <!-- Custom CSS -->
+    <link href="/css/style.css" rel="stylesheet" />
+  </head>
+  <body class="bg-body-tertiary">
+    <!-- Navbar Container -->
+    <div id="main-navbar"></div>
+
+    <main class="py-4 py-lg-5">
+      <div class="container-xl">
+        <!-- Title & Action Bar -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+          <div>
+            <div class="d-flex align-items-center gap-2">
+              <h1 class="h2 fw-bold mb-0">Platform User Directory</h1>
+              <span class="badge bg-danger text-uppercase px-2 py-1">Admin Only</span>
+            </div>
+            <p class="text-secondary mb-0 small mt-1">Approve pending jury accounts, invite judges, and monitor registered participants.</p>
+          </div>
+          <div>
+            <button class="btn btn-th-primary fw-semibold d-flex align-items-center gap-2" id="open-add-judge-btn">
+              <i class="bi bi-person-plus-fill"></i> Add Faculty Judge
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="card card-th-static p-3 mb-4">
+          <div class="row g-3 align-items-center">
+            <div class="col-md-6">
+              <div class="input-group">
+                <span class="input-group-text bg-body border-end-0"><i class="bi bi-search text-secondary"></i></span>
+                <input type="text" class="form-control border-start-0" id="user-search-input" placeholder="Search by name or email..." />
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <select class="form-select" id="user-role-filter">
+                <option value="all">All Roles & Statuses</option>
+                <option value="pending_judge">Pending Judges (Needs Approval)</option>
+                <option value="judge">Approved Judges</option>
+                <option value="participant">Participants</option>
+                <option value="admin">Administrators</option>
+              </select>
+            </div>
+            <div class="col-md-2 text-md-end">
+              <button class="btn btn-outline-secondary w-100" id="user-reset-filter" title="Reset Filters">
+                <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Users Table Card -->
+        <div class="card card-th-static p-0 overflow-hidden shadow-sm">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr class="small text-secondary">
+                  <th>User Details</th>
+                  <th>Role</th>
+                  <th>Account Status</th>
+                  <th>Joined Date</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body">
+                <!-- Skeletons -->
+                <tr>
+                  <td colspan="5" class="p-4">
+                    <div class="skeleton-line mb-2" style="width: 50%;"></div>
+                    <div class="skeleton-line" style="width: 80%;"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Add Judge Modal -->
+    <div class="modal fade" id="add-judge-modal" tabindex="-1" aria-labelledby="addJudgeLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content card-th-static">
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold" id="addJudgeLabel">
+              <i class="bi bi-award-fill text-purple me-2"></i>Add Faculty Judge
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form id="add-judge-form" novalidate>
+            <div class="modal-body">
+              <p class="small text-secondary mb-3">
+                Judges created directly by an administrator are instantly approved and can log in immediately.
+              </p>
+
+              <div class="mb-3">
+                <label for="judge-name-input" class="form-label small fw-semibold">Judge Full Name</label>
+                <input type="text" class="form-control" id="judge-name-input" placeholder="e.g. Prof. Rajiv Nair" required />
+                <div class="invalid-feedback">Full name is required.</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="judge-email-input" class="form-label small fw-semibold">Official Email</label>
+                <input type="email" class="form-control" id="judge-email-input" placeholder="judge@college.edu" required />
+                <div class="invalid-feedback">Valid unique email is required.</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="judge-password-input" class="form-label small fw-semibold">Temporary Password</label>
+                <input type="password" class="form-control" id="judge-password-input" placeholder="Min. 8 characters with letter & number" required />
+                <div class="invalid-feedback">Password must have at least 8 characters with at least one letter and one number.</div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-th-primary" id="add-judge-submit-btn">Add & Approve Judge</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="th-footer mt-auto">
+      <div class="container-xl text-center">
+        <p class="mb-0 small text-secondary">TalentHunt &copy; 2026. Online Talent Hunt and Competition Management Platform.</p>
+      </div>
+    </footer>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core App JS -->
+    <script src="/js/app.js"></script>
+    <script>
+      let allUsers = [];
+
+      onReady(async () => {
+        // Enforce admin role strictly
+        if (!requireLogin(['admin'])) return;
+        renderNav('users');
+
+        await loadUsers();
+
+        // Filters
+        document.getElementById('user-search-input').addEventListener('input', applyUserFilters);
+        document.getElementById('user-role-filter').addEventListener('change', applyUserFilters);
+        document.getElementById('user-reset-filter').addEventListener('click', () => {
+          document.getElementById('user-search-input').value = '';
+          document.getElementById('user-role-filter').value = 'all';
+          applyUserFilters();
+        });
+
+        // Add Judge Modal
+        document.getElementById('open-add-judge-btn')?.addEventListener('click', () => {
+          const form = document.getElementById('add-judge-form');
+          clearInvalid(form);
+          form.reset();
+          new bootstrap.Modal(document.getElementById('add-judge-modal')).show();
+        });
+
+        setupAddJudgeForm();
+      });
+
+      async function loadUsers() {
+        try {
+          allUsers = await api('/users');
+          applyUserFilters();
+        } catch (err) {
+          showToast((err && err.message) || 'Error loading users list', 'danger');
+        }
+      }
+
+      function applyUserFilters() {
+        const query = document.getElementById('user-search-input').value.toLowerCase().trim();
+        const roleFilter = document.getElementById('user-role-filter').value;
+
+        const filtered = allUsers.filter(u => {
+          const matchQuery = !query || u.name.toLowerCase().includes(query) || u.email.toLowerCase().includes(query);
+          let matchRole = true;
+
+          if (roleFilter === 'pending_judge') {
+            matchRole = u.role === 'judge' && u.status === 'pending';
+          } else if (roleFilter !== 'all') {
+            matchRole = u.role === roleFilter && (roleFilter !== 'judge' || u.status === 'approved');
+          }
+
+          return matchQuery && matchRole;
+        });
+
+        renderUsersTable(filtered);
+      }
+
+      function renderUsersTable(users) {
+        const tbody = document.getElementById('users-table-body');
+        if (users.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="5" class="text-center py-5 text-secondary">
+                <i class="bi bi-people empty-state-icon d-block mb-2"></i>
+                <h5 class="fw-bold">No Users Found</h5>
+                <p class="small text-secondary mb-0">Try clearing filters or search terms.</p>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = users.map(u => {
+          const rClass = u.role === 'admin' ? 'badge-role-admin' :
+                         u.role === 'judge' ? 'badge-role-judge' : 'badge-role-participant';
+          const rLabel = u.role.charAt(0).toUpperCase() + u.role.slice(1);
+
+          let statusBadge = '';
+          if (u.status === 'approved') {
+            statusBadge = '<span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle me-1"></i>Approved</span>';
+          } else {
+            statusBadge = '<span class="badge bg-warning-subtle text-warning-emphasis"><i class="bi bi-clock-history me-1"></i>Pending Approval</span>';
+          }
+
+          let actionButtons = '';
+          if (u.role === 'judge' && u.status === 'pending') {
+            actionButtons += `
+              <button class="btn btn-sm btn-success fw-semibold me-1" onclick="approveJudge('${u.id}', '${esc(u.name)}')">
+                <i class="bi bi-check2"></i> Approve
+              </button>
+            `;
+          }
+
+          if (u.role !== 'admin') {
+            actionButtons += `
+              <button class="btn btn-sm btn-outline-danger" onclick="removeUser('${u.id}', '${esc(u.name)}', '${u.role}')" title="Remove User">
+                <i class="bi bi-trash"></i>
+              </button>
+            `;
+          } else {
+            actionButtons += `<span class="badge bg-secondary-subtle text-secondary small">Protected</span>`;
+          }
+
+          return `
+            <tr>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; font-size: 0.9rem;">
+                    ${esc(u.name.charAt(0).toUpperCase())}
+                  </div>
+                  <div>
+                    <div class="fw-bold text-body-emphasis">${esc(u.name)}</div>
+                    <div class="text-muted small">${esc(u.email)}</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="badge ${rClass} text-uppercase">${rLabel}</span></td>
+              <td>${statusBadge}</td>
+              <td class="text-secondary small">${formatDate(u.createdAt)}</td>
+              <td class="text-end text-nowrap">${actionButtons}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      function setupAddJudgeForm() {
+        const form = document.getElementById('add-judge-form');
+        const submitBtn = document.getElementById('add-judge-submit-btn');
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          clearInvalid(form);
+
+          const nameInput = document.getElementById('judge-name-input');
+          const emailInput = document.getElementById('judge-email-input');
+          const pwdInput = document.getElementById('judge-password-input');
+
+          const name = nameInput.value.trim();
+          const email = emailInput.value.trim();
+          const pwd = pwdInput.value;
+
+          let hasErr = false;
+          if (!name) {
+            markInvalid(nameInput, 'Full name is required');
+            hasErr = true;
+          }
+          if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            markInvalid(emailInput, 'Valid email format required');
+            hasErr = true;
+          }
+          if (pwd.length < 8 || !/[A-Za-z]/.test(pwd) || !/[0-9]/.test(pwd)) {
+            markInvalid(pwdInput, 'Password must be at least 8 characters with letter & number');
+            hasErr = true;
+          }
+          if (hasErr) return;
+
+          setBtnLoading(submitBtn, true);
+
+          try {
+            await api('/users', 'POST', {
+              name,
+              email,
+              password: pwd,
+              role: 'judge'
+            });
+
+            setBtnLoading(submitBtn, false);
+            bootstrap.Modal.getInstance(document.getElementById('add-judge-modal')).hide();
+            showToast(`Judge ${name} added and approved successfully!`, 'success');
+            await loadUsers();
+          } catch (err) {
+            setBtnLoading(submitBtn, false);
+            showToast((err && err.message) || 'Error creating judge', 'danger');
+          }
+        });
+      }
+
+      async function approveJudge(userId, name) {
+        try {
+          await api(`/users/${userId}/approve`, 'POST');
+          showToast(`Judge account for ${name} has been approved!`, 'success');
+          await loadUsers();
+        } catch (err) {
+          showToast((err && err.message) || 'Error approving judge', 'danger');
+        }
+      }
+
+      function removeUser(userId, name, role) {
+        showConfirmModal(
+          `Remove ${role.toUpperCase()}: ${name}`,
+          `Are you sure you want to remove <strong>${name}</strong>?<br><br><span class="text-danger small"><i class="bi bi-exclamation-triangle-fill me-1"></i>Warning: All registrations, submitted entries, and judge scores associated with this account will also be permanently deleted.</span>`,
+          'Remove User',
+          async () => {
+            try {
+              await api(`/users/${userId}`, 'DELETE');
+              showToast(`User ${name} removed.`, 'info');
+              await loadUsers();
+            } catch (err) {
+              showToast((err && err.message) || 'Error deleting user', 'danger');
+            }
+          }
+        );
+      }
+    </script>
+  </body>
+</html>
